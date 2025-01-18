@@ -32,11 +32,15 @@ const Auth = () => {
               .from("profiles")
               .select("username")
               .eq("id", session.user.id)
-              .single();
+              .maybeSingle();
 
-            if (profileError) throw profileError;
+            if (profileError) {
+              console.error("Profile fetch error:", profileError);
+              throw profileError;
+            }
 
-            if (profile?.username.startsWith("user_")) {
+            // If no profile exists or username starts with "user_", show username form
+            if (!profile || profile.username.startsWith("user_")) {
               setShowUsernameForm(true);
             } else {
               navigate("/");
