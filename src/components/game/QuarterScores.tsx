@@ -12,28 +12,28 @@ export const QuarterScores = ({ localTeam, roadTeam }: QuarterScoresProps) => {
       <CardHeader className="pb-2">
         <CardTitle className="text-lg">Quarter Scores</CardTitle>
       </CardHeader>
-      <CardContent>
-        <div className="space-y-2">
-          <div className="grid grid-cols-5 gap-2 text-sm font-medium">
+      <CardContent className="overflow-x-auto">
+        <div className="min-w-[300px]">
+          <div className="grid grid-cols-5 gap-2 text-sm font-medium mb-2 text-muted-foreground">
             <div>Team</div>
-            <div>Q1</div>
-            <div>Q2</div>
-            <div>Q3</div>
-            <div>Q4</div>
+            <div className="text-right">Q1</div>
+            <div className="text-right">Q2</div>
+            <div className="text-right">Q3</div>
+            <div className="text-right">Q4</div>
           </div>
-          <div className="grid grid-cols-5 gap-2 text-sm">
-            <div>{localTeam.name}</div>
-            <div>{localTeam.partials.Partial1}</div>
-            <div>{localTeam.partials.Partial2}</div>
-            <div>{localTeam.partials.Partial3}</div>
-            <div>{localTeam.partials.Partial4}</div>
+          <div className="grid grid-cols-5 gap-2 text-sm items-center py-2 border-t">
+            <div className="font-medium truncate">{localTeam.name}</div>
+            <div className="text-right">{localTeam.partials.Partial1}</div>
+            <div className="text-right">{localTeam.partials.Partial2}</div>
+            <div className="text-right">{localTeam.partials.Partial3}</div>
+            <div className="text-right">{localTeam.partials.Partial4}</div>
           </div>
-          <div className="grid grid-cols-5 gap-2 text-sm">
-            <div>{roadTeam.name}</div>
-            <div>{roadTeam.partials.Partial1}</div>
-            <div>{roadTeam.partials.Partial2}</div>
-            <div>{roadTeam.partials.Partial3}</div>
-            <div>{roadTeam.partials.Partial4}</div>
+          <div className="grid grid-cols-5 gap-2 text-sm items-center py-2 border-t">
+            <div className="font-medium truncate">{roadTeam.name}</div>
+            <div className="text-right">{roadTeam.partials.Partial1}</div>
+            <div className="text-right">{roadTeam.partials.Partial2}</div>
+            <div className="text-right">{roadTeam.partials.Partial3}</div>
+            <div className="text-right">{roadTeam.partials.Partial4}</div>
           </div>
         </div>
       </CardContent>

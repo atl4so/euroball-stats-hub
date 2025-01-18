@@ -25,12 +25,12 @@ export const TeamStats = ({ team }: TeamStatsProps) => {
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead className="font-medium">Player</TableHead>
+                <TableHead className="font-medium whitespace-nowrap">Player</TableHead>
                 <TableHead className="text-right">MIN</TableHead>
                 <TableHead className="text-right">PTS</TableHead>
-                <TableHead className="text-right">2PM-A</TableHead>
-                <TableHead className="text-right">3PM-A</TableHead>
-                <TableHead className="text-right">FTM-A</TableHead>
+                <TableHead className="text-right whitespace-nowrap">2PM-A</TableHead>
+                <TableHead className="text-right whitespace-nowrap">3PM-A</TableHead>
+                <TableHead className="text-right whitespace-nowrap">FTM-A</TableHead>
                 <TableHead className="text-right">REB</TableHead>
                 <TableHead className="text-right">AST</TableHead>
                 <TableHead className="text-right">STL</TableHead>
@@ -43,7 +43,7 @@ export const TeamStats = ({ team }: TeamStatsProps) => {
             <TableBody>
               {team.playerstats.stat.map((player) => (
                 <TableRow key={player.PlayerCode}>
-                  <TableCell className="font-medium">
+                  <TableCell className="font-medium whitespace-nowrap">
                     <Link
                       to={`/player/${player.PlayerCode}`}
                       className="hover:text-primary hover:underline"

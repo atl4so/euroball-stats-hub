@@ -15,31 +15,29 @@ const GameDetails = () => {
     queryFn: () => fetchGameDetails(Number(gameCode), "E2023"),
   });
 
-  if (isLoading) return <div>Loading...</div>;
-  if (!gameDetails) return <div>No game details found</div>;
+  if (isLoading) return <div className="p-4">Loading...</div>;
+  if (!gameDetails) return <div className="p-4">No game details found</div>;
 
   return (
-    <div className="container mx-auto p-4 space-y-4">
+    <div className="container mx-auto px-4 py-6 space-y-6 max-w-7xl">
       <GameHeader
         localTeam={gameDetails.localclub.name}
         roadTeam={gameDetails.roadclub.name}
         date={gameDetails.cetdate}
       />
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
         <GameScore
           localTeam={gameDetails.localclub.name}
           localScore={gameDetails.localclub.score}
           roadTeam={gameDetails.roadclub.name}
           roadScore={gameDetails.roadclub.score}
         />
-
         <GameLocation
           stadium={gameDetails.stadium}
           stadiumName={gameDetails.stadiumname}
           audience={gameDetails.audience}
         />
-
         <GameStatus played={gameDetails.played} />
       </div>
 
@@ -48,7 +46,7 @@ const GameDetails = () => {
         roadTeam={gameDetails.roadclub}
       />
 
-      <div className="space-y-4">
+      <div className="space-y-6">
         <TeamStats team={gameDetails.localclub} />
         <TeamStats team={gameDetails.roadclub} />
       </div>
