@@ -162,18 +162,35 @@ const Profile = () => {
 
   // Delete account
   const deleteAccount = async () => {
+    if (!user) return;
+
     try {
       setLoading(true);
-      const { error } = await supabase.auth.admin.deleteUser(user?.id as string);
-      if (error) throw error;
 
+      // First, delete the user's profile
+      const { error: profileError } = await supabase
+        .from('profiles')
+        .delete()
+        .eq('id', user.id);
+
+      if (profileError) throw profileError;
+
+      // Then, delete the user's account
+      const { error: deleteError } = await supabase.auth.updateUser({
+        data: { deleted: true }
+      });
+
+      if (deleteError) throw deleteError;
+
+      // Finally, sign out the user
       await supabase.auth.signOut();
+      
       navigate("/");
       toast({
         title: "Account deleted",
         description: "Your account has been deleted successfully.",
       });
-    } catch (error) {
+    } catch (error: any) {
       toast({
         variant: "destructive",
         title: "Error deleting account",
