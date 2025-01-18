@@ -1,7 +1,7 @@
+import { useParams } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
-import { useParams, Link } from "react-router-dom";
 import { fetchGameDetails } from "@/services/euroleagueApi";
-import { Skeleton } from "@/components/ui/skeleton";
+import { Link } from "react-router-dom";
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -11,34 +11,32 @@ import {
   BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
 
 const GameDetails = () => {
   const { gameCode } = useParams();
-  
   const { data: gameDetails, isLoading } = useQuery({
     queryKey: ["gameDetails", gameCode],
-    queryFn: () => fetchGameDetails(Number(gameCode) || 0, "E2024"),
-    enabled: !!gameCode
+    queryFn: () => fetchGameDetails(Number(gameCode), "E2023"),
   });
 
-  if (isLoading) {
-    return (
-      <div className="container mx-auto p-4 space-y-4">
-        <Skeleton className="h-8 w-full max-w-md" />
-        <Skeleton className="h-[400px] w-full" />
-      </div>
-    );
-  }
-
-  if (!gameDetails) return null;
+  if (isLoading) return <div>Loading...</div>;
+  if (!gameDetails) return <div>No game details found</div>;
 
   return (
     <div className="container mx-auto p-4 space-y-6">
       <Breadcrumb>
         <BreadcrumbList>
           <BreadcrumbItem>
-            <BreadcrumbLink asChild>
-              <Link to="/">Home</Link>
+            <BreadcrumbLink as={Link} to="/">
+              Home
             </BreadcrumbLink>
           </BreadcrumbItem>
           <BreadcrumbSeparator />
@@ -124,6 +122,108 @@ const GameDetails = () => {
           </CardContent>
         </Card>
       </div>
+
+      {/* Home Team Player Stats */}
+      <Card>
+        <CardHeader>
+          <CardTitle>{gameDetails.localclub.name} Player Statistics</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead>Player</TableHead>
+                <TableHead>MIN</TableHead>
+                <TableHead>PTS</TableHead>
+                <TableHead>2PM-A</TableHead>
+                <TableHead>3PM-A</TableHead>
+                <TableHead>FTM-A</TableHead>
+                <TableHead>REB</TableHead>
+                <TableHead>AST</TableHead>
+                <TableHead>STL</TableHead>
+                <TableHead>BLK</TableHead>
+                <TableHead>TO</TableHead>
+                <TableHead>PF</TableHead>
+                <TableHead>PIR</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {gameDetails.localclub.playerstats.stat.map((player) => (
+                <TableRow key={player.PlayerCode}>
+                  <TableCell className="font-medium">
+                    <Link to={`/player/${player.PlayerCode}`} className="hover:underline">
+                      {player.PlayerName}
+                    </Link>
+                  </TableCell>
+                  <TableCell>{player.TimePlayed}</TableCell>
+                  <TableCell>{player.Score}</TableCell>
+                  <TableCell>{`${player.FieldGoalsMade2}-${player.FieldGoalsAttempted2}`}</TableCell>
+                  <TableCell>{`${player.FieldGoalsMade3}-${player.FieldGoalsAttempted3}`}</TableCell>
+                  <TableCell>{`${player.FreeThrowsMade}-${player.FreeThrowsAttempted}`}</TableCell>
+                  <TableCell>{player.TotalRebounds}</TableCell>
+                  <TableCell>{player.Assistances}</TableCell>
+                  <TableCell>{player.Steals}</TableCell>
+                  <TableCell>{player.BlocksFavour}</TableCell>
+                  <TableCell>{player.Turnovers}</TableCell>
+                  <TableCell>{player.FoulsCommited}</TableCell>
+                  <TableCell>{player.Valuation}</TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </CardContent>
+      </Card>
+
+      {/* Away Team Player Stats */}
+      <Card>
+        <CardHeader>
+          <CardTitle>{gameDetails.roadclub.name} Player Statistics</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead>Player</TableHead>
+                <TableHead>MIN</TableHead>
+                <TableHead>PTS</TableHead>
+                <TableHead>2PM-A</TableHead>
+                <TableHead>3PM-A</TableHead>
+                <TableHead>FTM-A</TableHead>
+                <TableHead>REB</TableHead>
+                <TableHead>AST</TableHead>
+                <TableHead>STL</TableHead>
+                <TableHead>BLK</TableHead>
+                <TableHead>TO</TableHead>
+                <TableHead>PF</TableHead>
+                <TableHead>PIR</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {gameDetails.roadclub.playerstats.stat.map((player) => (
+                <TableRow key={player.PlayerCode}>
+                  <TableCell className="font-medium">
+                    <Link to={`/player/${player.PlayerCode}`} className="hover:underline">
+                      {player.PlayerName}
+                    </Link>
+                  </TableCell>
+                  <TableCell>{player.TimePlayed}</TableCell>
+                  <TableCell>{player.Score}</TableCell>
+                  <TableCell>{`${player.FieldGoalsMade2}-${player.FieldGoalsAttempted2}`}</TableCell>
+                  <TableCell>{`${player.FieldGoalsMade3}-${player.FieldGoalsAttempted3}`}</TableCell>
+                  <TableCell>{`${player.FreeThrowsMade}-${player.FreeThrowsAttempted}`}</TableCell>
+                  <TableCell>{player.TotalRebounds}</TableCell>
+                  <TableCell>{player.Assistances}</TableCell>
+                  <TableCell>{player.Steals}</TableCell>
+                  <TableCell>{player.BlocksFavour}</TableCell>
+                  <TableCell>{player.Turnovers}</TableCell>
+                  <TableCell>{player.FoulsCommited}</TableCell>
+                  <TableCell>{player.Valuation}</TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </CardContent>
+      </Card>
     </div>
   );
 };
