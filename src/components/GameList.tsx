@@ -17,6 +17,8 @@ interface GameListProps {
   onPageChange: (page: number) => void;
 }
 
+const CURRENT_ROUND = 22; // Last completed round
+
 export const GameList = ({ games, isLoading, currentRound, onPageChange }: GameListProps) => {
   if (isLoading) {
     return (
@@ -104,7 +106,7 @@ export const GameList = ({ games, isLoading, currentRound, onPageChange }: GameL
               />
             </PaginationItem>
             
-            {Array.from({ length: 34 }, (_, i) => i + 1).map((round) => (
+            {Array.from({ length: CURRENT_ROUND }, (_, i) => i + 1).map((round) => (
               <PaginationItem key={round} className="hidden md:inline-block">
                 <PaginationLink
                   href="#"
@@ -124,9 +126,9 @@ export const GameList = ({ games, isLoading, currentRound, onPageChange }: GameL
                 href="#" 
                 onClick={(e) => {
                   e.preventDefault();
-                  if (currentRound < 34) onPageChange(currentRound + 1);
+                  if (currentRound < CURRENT_ROUND) onPageChange(currentRound + 1);
                 }}
-                className={currentRound >= 34 ? "pointer-events-none opacity-50" : ""}
+                className={currentRound >= CURRENT_ROUND ? "pointer-events-none opacity-50" : ""}
               />
             </PaginationItem>
           </PaginationContent>

@@ -7,21 +7,27 @@ import { Button } from "@/components/ui/button";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
+const CURRENT_ROUND = 22; // Last completed round
+const NEXT_ROUND = CURRENT_ROUND + 1;
+
 const Index = () => {
-  const [gameday, setGameday] = useState(22);
+  const [gameday, setGameday] = useState(CURRENT_ROUND);
   
   const { data: resultsData, isLoading: isLoadingResults } = useQuery({
     queryKey: ["results", gameday],
-    queryFn: () => fetchResults("E2024", gameday)
+    queryFn: () => fetchResults("E2024", gameday),
+    enabled: gameday <= CURRENT_ROUND // Only fetch if it's a completed round
   });
 
   const { data: scheduleData, isLoading: isLoadingSchedule } = useQuery({
-    queryKey: ["schedule", gameday + 1],
-    queryFn: () => fetchSchedule("E2024", gameday + 1)
+    queryKey: ["schedule", NEXT_ROUND],
+    queryFn: () => fetchSchedule("E2024", NEXT_ROUND)
   });
 
   const handlePageChange = (page: number) => {
-    setGameday(page);
+    if (page <= CURRENT_ROUND) {
+      setGameday(page);
+    }
   };
 
   return (
@@ -49,7 +55,7 @@ const Index = () => {
               variant="outline"
               size="sm"
               onClick={() => handlePageChange(gameday + 1)}
-              disabled={gameday >= 34}
+              disabled={gameday >= CURRENT_ROUND}
             >
               Next
               <ChevronRight className="h-4 w-4" />
@@ -61,8 +67,8 @@ const Index = () => {
       <main className="container mx-auto max-w-2xl">
         <Tabs defaultValue="results" className="mt-4">
           <TabsList className="grid w-full grid-cols-2">
-            <TabsTrigger value="results">Results</TabsTrigger>
-            <TabsTrigger value="schedule">Upcoming Games</TabsTrigger>
+            <TabsTrigger value="results">Results (Round {gameday})</TabsTrigger>
+            <TabsTrigger value="schedule">Upcoming (Round {NEXT_ROUND})</TabsTrigger>
           </TabsList>
           <TabsContent value="results">
             <GameList
