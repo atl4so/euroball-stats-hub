@@ -46,6 +46,35 @@ export interface ScheduleResponse {
   item: ScheduleItem[];
 }
 
+export interface PlayerStat {
+  TimePlayed: string;
+  TimePlayedSeconds: number;
+  Dorsal: number;
+  PlayerCode: string;
+  PlayerName: string;
+  PlayerAlias: string;
+  StartFive: boolean;
+  Valuation: number;
+  Score: number;
+  FieldGoalsMade2: number;
+  FieldGoalsAttempted2: number;
+  FieldGoalsMade3: number;
+  FieldGoalsAttempted3: number;
+  FreeThrowsMade: number;
+  FreeThrowsAttempted: number;
+  TotalRebounds: number;
+  DefensiveRebounds: number;
+  OffensiveRebounds: number;
+  Assistances: number;
+  Steals: number;
+  Turnovers: number;
+  BlocksFavour: number;
+  BlocksAgainst: number;
+  FoulsCommited: number;
+  FoulsReceived: number;
+  PlusMinus: number;
+}
+
 export interface PlayerStats {
   accumulated: {
     season: {
@@ -113,31 +142,29 @@ export interface PlayerDetails {
   stats?: PlayerStats;
 }
 
-export interface GameDetails {
-  gamecode: string;
-  round: string;
-  date: string;
-  time: string;
-  hometeam: string;
-  awayteam: string;
-  homescore: number;
-  awayscore: number;
-  arena: string;
-  city: string;
-  country: string;
-  attendance: number;
-  referees: string[];
+export interface TeamStats {
+  code: string;
+  name: string;
+  score: number;
+  playerstats: {
+    stat: PlayerStat[];
+  };
+  partials: {
+    Partial1: number;
+    Partial2: number;
+    Partial3: number;
+    Partial4: number;
+  };
 }
 
-export interface TeamStats {
-  teamCode: string;
-  teamName: string;
-  score: number;
-  rebounds: number;
-  assists: number;
-  steals: number;
-  blocks: number;
-  turnovers: number;
-  fouls: number;
-  timeouts: number;
+export interface GameDetails {
+  seasoncode: string;
+  code: string;
+  played: boolean;
+  cetdate: string;
+  stadium: string;
+  stadiumname: string;
+  audience: number;
+  localclub: TeamStats;
+  roadclub: TeamStats;
 }

@@ -16,7 +16,7 @@ const GameDetails = () => {
   
   const { data: gameDetails, isLoading } = useQuery({
     queryKey: ["gameDetails", gameCode],
-    queryFn: () => fetchGameDetails(gameCode || ""),
+    queryFn: () => fetchGameDetails(gameCode || "", "E2024"),
     enabled: !!gameCode
   });
 
@@ -36,7 +36,9 @@ const GameDetails = () => {
       <Breadcrumb>
         <BreadcrumbList>
           <BreadcrumbItem>
-            <BreadcrumbLink as={Link} to="/">Home</BreadcrumbLink>
+            <BreadcrumbLink asChild>
+              <Link to="/">Home</Link>
+            </BreadcrumbLink>
           </BreadcrumbItem>
           <BreadcrumbSeparator />
           <BreadcrumbItem>
