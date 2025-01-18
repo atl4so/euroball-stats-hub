@@ -7,6 +7,7 @@ import { GameLocation } from "@/components/game/GameLocation";
 import { GameStatus } from "@/components/game/GameStatus";
 import { QuarterScores } from "@/components/game/QuarterScores";
 import { TeamStats } from "@/components/game/TeamStats";
+import { useEffect } from "react";
 
 const GameDetails = () => {
   const { gameCode } = useParams();
@@ -14,6 +15,12 @@ const GameDetails = () => {
     queryKey: ["gameDetails", gameCode],
     queryFn: () => fetchGameDetails(Number(gameCode), "E2023"),
   });
+
+  useEffect(() => {
+    if (gameDetails) {
+      document.title = `${gameDetails.localclub.name} vs ${gameDetails.roadclub.name} - Euroleague Game ${gameCode}`;
+    }
+  }, [gameDetails, gameCode]);
 
   if (isLoading) return <div className="p-4">Loading...</div>;
   if (!gameDetails) return <div className="p-4">No game details found</div>;

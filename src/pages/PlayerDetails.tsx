@@ -12,6 +12,7 @@ import {
   BreadcrumbPage,
   BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb";
+import { useEffect } from "react";
 
 const PlayerDetails = () => {
   const { playerCode } = useParams();
@@ -21,6 +22,12 @@ const PlayerDetails = () => {
     queryFn: () => fetchPlayerDetails(playerCode || "", "E2024"),
     enabled: !!playerCode
   });
+
+  useEffect(() => {
+    if (playerDetails) {
+      document.title = `${playerDetails.name} - ${playerDetails.clubName} Player Profile`;
+    }
+  }, [playerDetails]);
 
   if (isLoading) {
     return (
