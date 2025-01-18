@@ -4,12 +4,13 @@ import { Auth as SupabaseAuth } from "@supabase/auth-ui-react";
 import { ThemeSupa } from "@supabase/auth-ui-shared";
 import { supabase } from "@/integrations/supabase/client";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import { useToast } from "@/components/ui/use-toast";
+import { useToast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { ArrowLeft } from "lucide-react";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
+import { AuthError, AuthApiError } from "@supabase/supabase-js";
 
 const Auth = () => {
   const navigate = useNavigate();
@@ -17,29 +18,42 @@ const Auth = () => {
   const [showUsernameForm, setShowUsernameForm] = useState(false);
   const [username, setUsername] = useState("");
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       async (event, session) => {
         if (event === "SIGNED_IN" && session) {
-          // Check if user already has a username
-          const { data: profile } = await supabase
-            .from("profiles")
-            .select("username")
-            .eq("id", session.user.id)
-            .single();
+          try {
+            const { data: profile, error: profileError } = await supabase
+              .from("profiles")
+              .select("username")
+              .eq("id", session.user.id)
+              .single();
 
-          if (profile?.username.startsWith("user_")) {
-            setShowUsernameForm(true);
-          } else {
-            navigate("/");
+            if (profileError) throw profileError;
+
+            if (profile?.username.startsWith("user_")) {
+              setShowUsernameForm(true);
+            } else {
+              navigate("/");
+            }
+          } catch (err) {
+            console.error("Error checking profile:", err);
+            toast({
+              variant: "destructive",
+              title: "Error",
+              description: "Failed to load user profile",
+            });
           }
+        } else if (event === "SIGNED_OUT") {
+          setError(null);
         }
       }
     );
 
     return () => subscription.unsubscribe();
-  }, [navigate]);
+  }, [navigate, toast]);
 
   const handleUsernameSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -76,6 +90,32 @@ const Auth = () => {
       setLoading(false);
     }
   };
+
+  const getErrorMessage = (error: AuthError) => {
+    if (error instanceof AuthApiError) {
+      switch (error.status) {
+        case 500:
+          return "An unexpected error occurred. Please try again later.";
+        case 400:
+          return "Invalid email or password format.";
+        default:
+          return error.message;
+      }
+    }
+    return error.message;
+  };
+
+  useEffect(() => {
+    const handleAuthError = supabase.auth.onAuthStateChange((event, session) => {
+      if (event === "USER_UPDATED" && !session) {
+        setError("Authentication failed. Please try again.");
+      }
+    });
+
+    return () => {
+      handleAuthError.data.subscription.unsubscribe();
+    };
+  }, []);
 
   if (showUsernameForm) {
     return (
@@ -139,6 +179,12 @@ const Auth = () => {
           <p className="text-muted-foreground">Sign in or create an account</p>
         </div>
         
+        {error && (
+          <Alert variant="destructive" className="mb-4">
+            <AlertDescription>{error}</AlertDescription>
+          </Alert>
+        )}
+
         <div className="bg-card p-6 rounded-lg shadow-sm border">
           <SupabaseAuth 
             supabaseClient={supabase}
