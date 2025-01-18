@@ -26,9 +26,6 @@ const PlayerDetails = () => {
 
   if (!playerDetails) return null;
 
-  // Get games played from stats if available
-  const gamesPlayed = playerDetails.stats?.accumulated?.season?.gamesplayed || 0;
-
   return (
     <div className="container mx-auto p-4 space-y-6">
       <div className="text-center space-y-2">
@@ -63,7 +60,6 @@ const PlayerDetails = () => {
             <CardTitle>Season Statistics</CardTitle>
           </CardHeader>
           <CardContent className="space-y-2">
-            <p><span className="font-semibold">Games Played:</span> {gamesPlayed}</p>
             <p><span className="font-semibold">Average Time Played:</span> {playerDetails.timePlayed}</p>
             <p><span className="font-semibold">Points Per Game:</span> {playerDetails.score}</p>
             <p><span className="font-semibold">Rebounds Per Game:</span> {playerDetails.totalRebounds}</p>
