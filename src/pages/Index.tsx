@@ -3,9 +3,14 @@ import { fetchResults, fetchSchedule } from "@/services/euroleagueApi";
 import { GameList } from "@/components/GameList";
 import { ScheduleList } from "@/components/ScheduleList";
 import { useState } from "react";
-import { Button } from "@/components/ui/button";
-import { ChevronLeft, ChevronRight } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 const CURRENT_ROUND = 22; // Last completed round
 const NEXT_ROUND = CURRENT_ROUND + 1;
@@ -50,10 +55,28 @@ const Index = () => {
       <main className="container mx-auto max-w-2xl">
         <Tabs defaultValue="results" className="mt-4">
           <TabsList className="grid w-full grid-cols-2">
-            <TabsTrigger value="results">Results (Round {resultsRound})</TabsTrigger>
-            <TabsTrigger value="schedule">Upcoming (Round {scheduleRound})</TabsTrigger>
+            <TabsTrigger value="results">Results</TabsTrigger>
+            <TabsTrigger value="schedule">Upcoming</TabsTrigger>
           </TabsList>
+          
           <TabsContent value="results">
+            <div className="mb-4">
+              <Select
+                value={resultsRound.toString()}
+                onValueChange={(value) => handleResultsPageChange(parseInt(value))}
+              >
+                <SelectTrigger className="w-[180px]">
+                  <SelectValue placeholder="Select round" />
+                </SelectTrigger>
+                <SelectContent>
+                  {Array.from({ length: CURRENT_ROUND }, (_, i) => CURRENT_ROUND - i).map((round) => (
+                    <SelectItem key={round} value={round.toString()}>
+                      Round {round}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
             <GameList
               games={resultsData?.game || []}
               isLoading={isLoadingResults}
@@ -61,7 +84,25 @@ const Index = () => {
               onPageChange={handleResultsPageChange}
             />
           </TabsContent>
+          
           <TabsContent value="schedule">
+            <div className="mb-4">
+              <Select
+                value={scheduleRound.toString()}
+                onValueChange={(value) => handleSchedulePageChange(parseInt(value))}
+              >
+                <SelectTrigger className="w-[180px]">
+                  <SelectValue placeholder="Select round" />
+                </SelectTrigger>
+                <SelectContent>
+                  {Array.from({ length: FINAL_ROUND - CURRENT_ROUND }, (_, i) => NEXT_ROUND + i).map((round) => (
+                    <SelectItem key={round} value={round.toString()}>
+                      Round {round}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
             <ScheduleList
               schedules={scheduleData?.item || []}
               isLoading={isLoadingSchedule}
