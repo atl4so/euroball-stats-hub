@@ -1,39 +1,29 @@
 import { useQuery } from "@tanstack/react-query";
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams, Link } from "react-router-dom";
 import { fetchGameDetails } from "@/services/euroleagueApi";
-import { format } from "date-fns";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { PlayerStat } from "@/types/euroleague";
+import {
+  Breadcrumb,
+  BreadcrumbItem,
+  BreadcrumbLink,
+  BreadcrumbList,
+  BreadcrumbPage,
+  BreadcrumbSeparator,
+} from "@/components/ui/breadcrumb";
 
 const GameDetails = () => {
   const { gameCode } = useParams();
-  const navigate = useNavigate();
   
   const { data: gameDetails, isLoading } = useQuery({
     queryKey: ["gameDetails", gameCode],
-    queryFn: () => fetchGameDetails("E2024", parseInt(gameCode || "0")),
+    queryFn: () => fetchGameDetails(gameCode || ""),
     enabled: !!gameCode
   });
-
-  const handlePlayerClick = (playerCode: string) => {
-    navigate(`/player/${playerCode}`);
-  };
 
   if (isLoading) {
     return (
       <div className="container mx-auto p-4 space-y-4">
         <Skeleton className="h-8 w-full max-w-md" />
-        <Skeleton className="h-[200px] w-full" />
         <Skeleton className="h-[400px] w-full" />
       </div>
     );
@@ -41,129 +31,47 @@ const GameDetails = () => {
 
   if (!gameDetails) return null;
 
-  const renderPlayerStats = (stats: PlayerStat[]) => (
-    <Table>
-      <TableHeader>
-        <TableRow>
-          <TableHead>Player</TableHead>
-          <TableHead className="text-right">MIN</TableHead>
-          <TableHead className="text-right">PTS</TableHead>
-          <TableHead className="text-right">2FG</TableHead>
-          <TableHead className="text-right">3FG</TableHead>
-          <TableHead className="text-right">FT</TableHead>
-          <TableHead className="text-right">REB</TableHead>
-          <TableHead className="text-right">AST</TableHead>
-          <TableHead className="text-right">STL</TableHead>
-          <TableHead className="text-right">BLK</TableHead>
-          <TableHead className="text-right">TO</TableHead>
-          <TableHead className="text-right">PIR</TableHead>
-        </TableRow>
-      </TableHeader>
-      <TableBody>
-        {stats.filter(player => player.PlayerName !== "Team").map((player) => (
-          <TableRow key={player.PlayerCode}>
-            <TableCell className="font-medium">
-              <Button 
-                variant="link" 
-                className="p-0 h-auto font-medium"
-                onClick={() => handlePlayerClick(player.PlayerCode)}
-              >
-                {player.PlayerName}
-                {player.StartFive && " *"}
-              </Button>
-            </TableCell>
-            <TableCell className="text-right">{player.TimePlayed}</TableCell>
-            <TableCell className="text-right">{player.Score}</TableCell>
-            <TableCell className="text-right">
-              {player.FieldGoalsMade2}/{player.FieldGoalsAttempted2}
-            </TableCell>
-            <TableCell className="text-right">
-              {player.FieldGoalsMade3}/{player.FieldGoalsAttempted3}
-            </TableCell>
-            <TableCell className="text-right">
-              {player.FreeThrowsMade}/{player.FreeThrowsAttempted}
-            </TableCell>
-            <TableCell className="text-right">{player.TotalRebounds}</TableCell>
-            <TableCell className="text-right">{player.Assistances}</TableCell>
-            <TableCell className="text-right">{player.Steals}</TableCell>
-            <TableCell className="text-right">{player.BlocksFavour}</TableCell>
-            <TableCell className="text-right">{player.Turnovers}</TableCell>
-            <TableCell className="text-right">{player.Valuation}</TableCell>
-          </TableRow>
-        ))}
-      </TableBody>
-    </Table>
-  );
-
   return (
     <div className="container mx-auto p-4 space-y-6">
+      <Breadcrumb>
+        <BreadcrumbList>
+          <BreadcrumbItem>
+            <BreadcrumbLink as={Link} to="/">Home</BreadcrumbLink>
+          </BreadcrumbItem>
+          <BreadcrumbSeparator />
+          <BreadcrumbItem>
+            <BreadcrumbPage>Game Details</BreadcrumbPage>
+          </BreadcrumbItem>
+        </BreadcrumbList>
+      </Breadcrumb>
+
       <div className="text-center space-y-2">
-        <h1 className="text-2xl font-bold">
-          {gameDetails.localclub.name} vs {gameDetails.roadclub.name}
-        </h1>
+        <h1 className="text-2xl font-bold">{gameDetails.hometeam} vs {gameDetails.awayteam}</h1>
         <p className="text-muted-foreground">
-          {format(new Date(gameDetails.cetdate), "MMMM d, yyyy")} • {gameDetails.stadiumname}
+          {gameDetails.date} at {gameDetails.time}
         </p>
-        <div className="text-xl font-semibold">
-          {gameDetails.localclub.score} - {gameDetails.roadclub.score}
-        </div>
       </div>
 
-      <Card>
-        <CardHeader>
-          <CardTitle>Quarter Scores</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Team</TableHead>
-                <TableHead className="text-right">Q1</TableHead>
-                <TableHead className="text-right">Q2</TableHead>
-                <TableHead className="text-right">Q3</TableHead>
-                <TableHead className="text-right">Q4</TableHead>
-                <TableHead className="text-right">Total</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              <TableRow>
-                <TableCell>{gameDetails.localclub.name}</TableCell>
-                <TableCell className="text-right">{gameDetails.localclub.partials.Partial1}</TableCell>
-                <TableCell className="text-right">{gameDetails.localclub.partials.Partial2}</TableCell>
-                <TableCell className="text-right">{gameDetails.localclub.partials.Partial3}</TableCell>
-                <TableCell className="text-right">{gameDetails.localclub.partials.Partial4}</TableCell>
-                <TableCell className="text-right font-bold">{gameDetails.localclub.score}</TableCell>
-              </TableRow>
-              <TableRow>
-                <TableCell>{gameDetails.roadclub.name}</TableCell>
-                <TableCell className="text-right">{gameDetails.roadclub.partials.Partial1}</TableCell>
-                <TableCell className="text-right">{gameDetails.roadclub.partials.Partial2}</TableCell>
-                <TableCell className="text-right">{gameDetails.roadclub.partials.Partial3}</TableCell>
-                <TableCell className="text-right">{gameDetails.roadclub.partials.Partial4}</TableCell>
-                <TableCell className="text-right font-bold">{gameDetails.roadclub.score}</TableCell>
-              </TableRow>
-            </TableBody>
-          </Table>
-        </CardContent>
-      </Card>
-
-      <Card>
-        <CardHeader>
-          <CardTitle>{gameDetails.localclub.name}</CardTitle>
-        </CardHeader>
-        <CardContent className="overflow-x-auto">
-          {renderPlayerStats(gameDetails.localclub.playerstats.stat)}
-        </CardContent>
-      </Card>
-
-      <Card>
-        <CardHeader>
-          <CardTitle>{gameDetails.roadclub.name}</CardTitle>
-        </CardHeader>
-        <CardContent className="overflow-x-auto">
-          {renderPlayerStats(gameDetails.roadclub.playerstats.stat)}
-        </CardContent>
-      </Card>
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div className="card">
+          <h2 className="font-semibold">Score</h2>
+          <p>{gameDetails.hometeam}: {gameDetails.homescore}</p>
+          <p>{gameDetails.awayteam}: {gameDetails.awayscore}</p>
+        </div>
+        <div className="card">
+          <h2 className="font-semibold">Location</h2>
+          <p>{gameDetails.arena}, {gameDetails.city}, {gameDetails.country}</p>
+          <p>Attendance: {gameDetails.attendance}</p>
+        </div>
+        <div className="card">
+          <h2 className="font-semibold">Referees</h2>
+          <ul>
+            {gameDetails.referees.map((referee, index) => (
+              <li key={index}>{referee}</li>
+            ))}
+          </ul>
+        </div>
+      </div>
     </div>
   );
 };

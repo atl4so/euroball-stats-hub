@@ -76,7 +76,6 @@ export interface PlayerStats {
         code: string;
         gamesplayed: number;
         timeplayed: string;
-        // ... same fields as season
       }[];
     };
   };
@@ -112,4 +111,33 @@ export interface PlayerDetails {
   career: string;
   misc: string;
   stats?: PlayerStats;
+}
+
+export interface GameDetails {
+  gamecode: string;
+  round: string;
+  date: string;
+  time: string;
+  hometeam: string;
+  awayteam: string;
+  homescore: number;
+  awayscore: number;
+  arena: string;
+  city: string;
+  country: string;
+  attendance: number;
+  referees: string[];
+}
+
+export interface TeamStats {
+  teamCode: string;
+  teamName: string;
+  score: number;
+  rebounds: number;
+  assists: number;
+  steals: number;
+  blocks: number;
+  turnovers: number;
+  fouls: number;
+  timeouts: number;
 }
