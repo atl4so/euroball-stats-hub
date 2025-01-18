@@ -1,26 +1,16 @@
-import { Toaster } from "@/components/ui/toaster";
-import { Toaster as Sonner } from "@/components/ui/sonner";
-import { TooltipProvider } from "@/components/ui/tooltip";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
-import Index from "./pages/Index";
-import GameDetails from "./pages/GameDetails";
+import { Routes, Route } from "react-router-dom";
+import Index from "@/pages/Index";
+import GameDetails from "@/pages/GameDetails";
+import PlayerDetails from "@/pages/PlayerDetails";
 
-const queryClient = new QueryClient();
-
-const App = () => (
-  <QueryClientProvider client={queryClient}>
-    <TooltipProvider>
-      <Toaster />
-      <Sonner />
-      <BrowserRouter>
-        <Routes>
-          <Route path="/" element={<Index />} />
-          <Route path="/game/:gameCode" element={<GameDetails />} />
-        </Routes>
-      </BrowserRouter>
-    </TooltipProvider>
-  </QueryClientProvider>
-);
+function App() {
+  return (
+    <Routes>
+      <Route path="/" element={<Index />} />
+      <Route path="/game/:gameCode" element={<GameDetails />} />
+      <Route path="/player/:playerCode" element={<PlayerDetails />} />
+    </Routes>
+  );
+}
 
 export default App;
