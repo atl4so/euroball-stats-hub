@@ -11,6 +11,18 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { Button } from "@/components/ui/button";
+import { Link } from "react-router-dom";
+import { useAuth } from "@/components/AuthProvider";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { LogOut, User } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
 
 const CURRENT_ROUND = 22; // Last completed round
 const NEXT_ROUND = CURRENT_ROUND + 1;
@@ -19,6 +31,7 @@ const FINAL_ROUND = 34; // Total rounds in the season
 const Index = () => {
   const [resultsRound, setResultsRound] = useState(CURRENT_ROUND);
   const [scheduleRound, setScheduleRound] = useState(NEXT_ROUND);
+  const { user } = useAuth();
   
   const { data: resultsData, isLoading: isLoadingResults } = useQuery({
     queryKey: ["results", resultsRound],
@@ -44,11 +57,40 @@ const Index = () => {
     }
   };
 
+  const handleSignOut = async () => {
+    await supabase.auth.signOut();
+  };
+
   return (
     <div className="min-h-screen bg-background">
       <header className="sticky top-0 z-10 bg-background/80 backdrop-blur-sm border-b">
-        <div className="container mx-auto px-4 py-4">
-          <h1 className="text-2xl font-bold text-center">Euroleague Games</h1>
+        <div className="container mx-auto px-4 py-4 flex justify-between items-center">
+          <h1 className="text-2xl font-bold">Euroleague Games</h1>
+          <div className="flex items-center gap-4">
+            {user ? (
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="ghost" size="icon">
+                    <User className="h-5 w-5" />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end">
+                  <DropdownMenuItem asChild>
+                    <Link to="/profile">Profile Settings</Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem onClick={handleSignOut}>
+                    <LogOut className="mr-2 h-4 w-4" />
+                    Sign Out
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            ) : (
+              <Button asChild variant="default">
+                <Link to="/auth">Sign In</Link>
+              </Button>
+            )}
+          </div>
         </div>
       </header>
 
