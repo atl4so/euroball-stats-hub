@@ -20,6 +20,9 @@ const Auth = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
+  // Get the current domain for the redirect URL
+  const redirectTo = `${window.location.origin}/auth/callback`;
+
   useEffect(() => {
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       async (event, session) => {
@@ -200,7 +203,7 @@ const Auth = () => {
               },
             }}
             providers={[]}
-            redirectTo={window.location.origin}
+            redirectTo={redirectTo}
           />
         </div>
       </div>
