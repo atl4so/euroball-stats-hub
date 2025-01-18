@@ -90,18 +90,6 @@ export interface TeamStats {
   };
 }
 
-export interface GameDetails {
-  seasoncode: string;
-  code: string;
-  played: boolean;
-  cetdate: string;
-  stadium: string;
-  stadiumname: string;
-  audience: number;
-  localclub: TeamStats;
-  roadclub: TeamStats;
-}
-
 export interface PlayerDetails {
   name: string;
   height: number;
@@ -131,4 +119,16 @@ export interface PlayerDetails {
   foulsReceived: number;
   career: string;
   misc: string;
+}
+
+export interface GameDetails {
+  seasoncode: string;
+  code: string;
+  played: boolean;
+  cetdate: string;
+  stadium: string;
+  stadiumname: string;
+  audience: number;
+  localclub: TeamStats;
+  roadclub: TeamStats;
 }
