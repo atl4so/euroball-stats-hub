@@ -26,6 +26,9 @@ const PlayerDetails = () => {
 
   if (!playerDetails) return null;
 
+  // Get games played from stats if available
+  const gamesPlayed = playerDetails.stats?.accumulated?.season?.gamesplayed || 0;
+
   return (
     <div className="container mx-auto p-4 space-y-6">
       <div className="text-center space-y-2">
@@ -60,13 +63,14 @@ const PlayerDetails = () => {
             <CardTitle>Season Statistics</CardTitle>
           </CardHeader>
           <CardContent className="space-y-2">
-            <p><span className="font-semibold">Games Played:</span> {playerDetails.timePlayed}</p>
-            <p><span className="font-semibold">Points:</span> {playerDetails.score}</p>
-            <p><span className="font-semibold">Rebounds:</span> {playerDetails.totalRebounds}</p>
-            <p><span className="font-semibold">Assists:</span> {playerDetails.assistances}</p>
-            <p><span className="font-semibold">Steals:</span> {playerDetails.steals}</p>
-            <p><span className="font-semibold">Blocks:</span> {playerDetails.blocksFavour}</p>
-            <p><span className="font-semibold">PIR:</span> {playerDetails.valuation}</p>
+            <p><span className="font-semibold">Games Played:</span> {gamesPlayed}</p>
+            <p><span className="font-semibold">Average Time Played:</span> {playerDetails.timePlayed}</p>
+            <p><span className="font-semibold">Points Per Game:</span> {playerDetails.score}</p>
+            <p><span className="font-semibold">Rebounds Per Game:</span> {playerDetails.totalRebounds}</p>
+            <p><span className="font-semibold">Assists Per Game:</span> {playerDetails.assistances}</p>
+            <p><span className="font-semibold">Steals Per Game:</span> {playerDetails.steals}</p>
+            <p><span className="font-semibold">Blocks Per Game:</span> {playerDetails.blocksFavour}</p>
+            <p><span className="font-semibold">PIR Per Game:</span> {playerDetails.valuation}</p>
             <p><span className="font-semibold">2PT%:</span> {playerDetails.fieldGoals2Percent}</p>
             <p><span className="font-semibold">3PT%:</span> {playerDetails.fieldGoals3Percent}</p>
             <p><span className="font-semibold">FT%:</span> {playerDetails.freeThrowsPercent}</p>
