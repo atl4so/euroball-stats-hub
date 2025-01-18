@@ -17,7 +17,7 @@ const GameDetails = () => {
       if (!gameCode) {
         throw new Error("Game code is required");
       }
-      return fetchGameDetails(parseInt(gameCode, 10), "E2023");
+      return fetchGameDetails(parseInt(gameCode, 10), "E2024");
     },
     enabled: !!gameCode,
   });
