@@ -10,17 +10,24 @@ import { TeamStats } from "@/components/game/TeamStats";
 import { useEffect } from "react";
 
 const GameDetails = () => {
-  const { gameCode } = useParams();
+  const { gameId } = useParams();
   const { data: gameDetails, isLoading } = useQuery({
-    queryKey: ["gameDetails", gameCode],
-    queryFn: () => fetchGameDetails(Number(gameCode), "E2023"),
+    queryKey: ["gameDetails", gameId],
+    queryFn: () => {
+      const gameCode = parseInt(gameId || "", 10);
+      if (isNaN(gameCode)) {
+        throw new Error("Invalid game ID");
+      }
+      return fetchGameDetails(gameCode, "E2023");
+    },
+    enabled: !!gameId,
   });
 
   useEffect(() => {
     if (gameDetails) {
-      document.title = `${gameDetails.localclub.name} vs ${gameDetails.roadclub.name} - Euroleague Game ${gameCode}`;
+      document.title = `${gameDetails.localclub.name} vs ${gameDetails.roadclub.name} - Euroleague Game ${gameId}`;
     }
-  }, [gameDetails, gameCode]);
+  }, [gameDetails, gameId]);
 
   if (isLoading) return <div className="p-4">Loading...</div>;
   if (!gameDetails) return <div className="p-4">No game details found</div>;
