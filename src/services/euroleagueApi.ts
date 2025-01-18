@@ -1,4 +1,4 @@
-import { ResultsResponse, ScheduleResponse, PlayerDetails } from "@/types/euroleague";
+import { ResultsResponse, ScheduleResponse, PlayerDetails, GameDetails, TeamStats } from "@/types/euroleague";
 
 const BASE_URL = "https://api-live.euroleague.net/v1";
 
