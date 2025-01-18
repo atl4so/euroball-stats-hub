@@ -84,7 +84,7 @@ export const fetchSchedule = async (seasonCode: string, gameNumber: number): Pro
   }
 };
 
-export const fetchGameDetails = async (seasonCode: string, gameCode: number): Promise<GameDetails> => {
+export const fetchGameDetails = async (gameCode: number, seasonCode: string): Promise<GameDetails> => {
   try {
     const response = await fetch(
       `${BASE_URL}/games?seasonCode=${seasonCode}&gameCode=${gameCode}`

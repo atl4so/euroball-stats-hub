@@ -16,7 +16,7 @@ const GameDetails = () => {
   
   const { data: gameDetails, isLoading } = useQuery({
     queryKey: ["gameDetails", gameCode],
-    queryFn: () => fetchGameDetails(gameCode || "", "E2024"),
+    queryFn: () => fetchGameDetails(Number(gameCode) || 0, "E2024"),
     enabled: !!gameCode
   });
 
@@ -48,30 +48,26 @@ const GameDetails = () => {
       </Breadcrumb>
 
       <div className="text-center space-y-2">
-        <h1 className="text-2xl font-bold">{gameDetails.hometeam} vs {gameDetails.awayteam}</h1>
+        <h1 className="text-2xl font-bold">{gameDetails.localclub.name} vs {gameDetails.roadclub.name}</h1>
         <p className="text-muted-foreground">
-          {gameDetails.date} at {gameDetails.time}
+          {gameDetails.cetdate}
         </p>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <div className="card">
           <h2 className="font-semibold">Score</h2>
-          <p>{gameDetails.hometeam}: {gameDetails.homescore}</p>
-          <p>{gameDetails.awayteam}: {gameDetails.awayscore}</p>
+          <p>{gameDetails.localclub.name}: {gameDetails.localclub.score}</p>
+          <p>{gameDetails.roadclub.name}: {gameDetails.roadclub.score}</p>
         </div>
         <div className="card">
           <h2 className="font-semibold">Location</h2>
-          <p>{gameDetails.arena}, {gameDetails.city}, {gameDetails.country}</p>
-          <p>Attendance: {gameDetails.attendance}</p>
+          <p>{gameDetails.stadium} - {gameDetails.stadiumname}</p>
+          <p>Attendance: {gameDetails.audience}</p>
         </div>
         <div className="card">
-          <h2 className="font-semibold">Referees</h2>
-          <ul>
-            {gameDetails.referees.map((referee, index) => (
-              <li key={index}>{referee}</li>
-            ))}
-          </ul>
+          <h2 className="font-semibold">Game Status</h2>
+          <p>Status: {gameDetails.played ? 'Completed' : 'Scheduled'}</p>
         </div>
       </div>
     </div>
