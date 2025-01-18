@@ -17,52 +17,57 @@ interface TeamStatsProps {
 export const TeamStats = ({ team }: TeamStatsProps) => {
   return (
     <Card>
-      <CardHeader>
-        <CardTitle>{team.name} Player Statistics</CardTitle>
+      <CardHeader className="pb-2">
+        <CardTitle className="text-lg">{team.name} Player Statistics</CardTitle>
       </CardHeader>
-      <CardContent>
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead>Player</TableHead>
-              <TableHead>MIN</TableHead>
-              <TableHead>PTS</TableHead>
-              <TableHead>2PM-A</TableHead>
-              <TableHead>3PM-A</TableHead>
-              <TableHead>FTM-A</TableHead>
-              <TableHead>REB</TableHead>
-              <TableHead>AST</TableHead>
-              <TableHead>STL</TableHead>
-              <TableHead>BLK</TableHead>
-              <TableHead>TO</TableHead>
-              <TableHead>PF</TableHead>
-              <TableHead>PIR</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {team.playerstats.stat.map((player) => (
-              <TableRow key={player.PlayerCode}>
-                <TableCell className="font-medium">
-                  <Link to={`/player/${player.PlayerCode}`} className="hover:underline">
-                    {player.PlayerName}
-                  </Link>
-                </TableCell>
-                <TableCell>{player.TimePlayed}</TableCell>
-                <TableCell>{player.Score}</TableCell>
-                <TableCell>{`${player.FieldGoalsMade2}-${player.FieldGoalsAttempted2}`}</TableCell>
-                <TableCell>{`${player.FieldGoalsMade3}-${player.FieldGoalsAttempted3}`}</TableCell>
-                <TableCell>{`${player.FreeThrowsMade}-${player.FreeThrowsAttempted}`}</TableCell>
-                <TableCell>{player.TotalRebounds}</TableCell>
-                <TableCell>{player.Assistances}</TableCell>
-                <TableCell>{player.Steals}</TableCell>
-                <TableCell>{player.BlocksFavour}</TableCell>
-                <TableCell>{player.Turnovers}</TableCell>
-                <TableCell>{player.FoulsCommited}</TableCell>
-                <TableCell>{player.Valuation}</TableCell>
+      <CardContent className="p-0">
+        <div className="overflow-x-auto">
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead className="font-medium">Player</TableHead>
+                <TableHead className="text-right">MIN</TableHead>
+                <TableHead className="text-right">PTS</TableHead>
+                <TableHead className="text-right">2PM-A</TableHead>
+                <TableHead className="text-right">3PM-A</TableHead>
+                <TableHead className="text-right">FTM-A</TableHead>
+                <TableHead className="text-right">REB</TableHead>
+                <TableHead className="text-right">AST</TableHead>
+                <TableHead className="text-right">STL</TableHead>
+                <TableHead className="text-right">BLK</TableHead>
+                <TableHead className="text-right">TO</TableHead>
+                <TableHead className="text-right">PF</TableHead>
+                <TableHead className="text-right">PIR</TableHead>
               </TableRow>
-            ))}
-          </TableBody>
-        </Table>
+            </TableHeader>
+            <TableBody>
+              {team.playerstats.stat.map((player) => (
+                <TableRow key={player.PlayerCode}>
+                  <TableCell className="font-medium">
+                    <Link
+                      to={`/player/${player.PlayerCode}`}
+                      className="hover:text-primary hover:underline"
+                    >
+                      {player.PlayerName}
+                    </Link>
+                  </TableCell>
+                  <TableCell className="text-right">{player.TimePlayed}</TableCell>
+                  <TableCell className="text-right">{player.Score}</TableCell>
+                  <TableCell className="text-right">{`${player.FieldGoalsMade2}-${player.FieldGoalsAttempted2}`}</TableCell>
+                  <TableCell className="text-right">{`${player.FieldGoalsMade3}-${player.FieldGoalsAttempted3}`}</TableCell>
+                  <TableCell className="text-right">{`${player.FreeThrowsMade}-${player.FreeThrowsAttempted}`}</TableCell>
+                  <TableCell className="text-right">{player.TotalRebounds}</TableCell>
+                  <TableCell className="text-right">{player.Assistances}</TableCell>
+                  <TableCell className="text-right">{player.Steals}</TableCell>
+                  <TableCell className="text-right">{player.BlocksFavour}</TableCell>
+                  <TableCell className="text-right">{player.Turnovers}</TableCell>
+                  <TableCell className="text-right">{player.FoulsCommited}</TableCell>
+                  <TableCell className="text-right">{player.Valuation}</TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </div>
       </CardContent>
     </Card>
   );

@@ -1,4 +1,4 @@
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 
 interface GameScoreProps {
   localTeam: string;
@@ -9,18 +9,15 @@ interface GameScoreProps {
 
 export const GameScore = ({ localTeam, localScore, roadTeam, roadScore }: GameScoreProps) => {
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle>Score</CardTitle>
-      </CardHeader>
-      <CardContent className="space-y-2">
+    <Card className="h-full">
+      <CardContent className="p-4 space-y-2">
         <div className="flex justify-between items-center">
-          <span className="font-semibold">{localTeam}</span>
-          <span className="text-2xl">{localScore}</span>
+          <span className="font-medium text-sm">{localTeam}</span>
+          <span className={`text-xl font-bold ${localScore > roadScore ? 'text-primary' : ''}`}>{localScore}</span>
         </div>
         <div className="flex justify-between items-center">
-          <span className="font-semibold">{roadTeam}</span>
-          <span className="text-2xl">{roadScore}</span>
+          <span className="font-medium text-sm">{roadTeam}</span>
+          <span className={`text-xl font-bold ${roadScore > localScore ? 'text-primary' : ''}`}>{roadScore}</span>
         </div>
       </CardContent>
     </Card>

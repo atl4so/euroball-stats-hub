@@ -31,11 +31,11 @@ export const GameHeader = ({ localTeam, roadTeam, date }: GameHeaderProps) => {
         </BreadcrumbList>
       </Breadcrumb>
 
-      <div className="text-center space-y-2">
-        <h1 className="text-3xl font-bold">
+      <div className="text-center space-y-1 my-2">
+        <h1 className="text-2xl font-bold">
           {localTeam} vs {roadTeam}
         </h1>
-        <p className="text-muted-foreground text-lg">{date}</p>
+        <p className="text-muted-foreground">{date}</p>
       </div>
     </>
   );

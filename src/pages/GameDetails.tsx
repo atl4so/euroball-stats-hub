@@ -19,14 +19,14 @@ const GameDetails = () => {
   if (!gameDetails) return <div>No game details found</div>;
 
   return (
-    <div className="container mx-auto p-4 space-y-6">
+    <div className="container mx-auto p-4 space-y-4">
       <GameHeader
         localTeam={gameDetails.localclub.name}
         roadTeam={gameDetails.roadclub.name}
         date={gameDetails.cetdate}
       />
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         <GameScore
           localTeam={gameDetails.localclub.name}
           localScore={gameDetails.localclub.score}
@@ -41,15 +41,17 @@ const GameDetails = () => {
         />
 
         <GameStatus played={gameDetails.played} />
-
-        <QuarterScores
-          localTeam={gameDetails.localclub}
-          roadTeam={gameDetails.roadclub}
-        />
       </div>
 
-      <TeamStats team={gameDetails.localclub} />
-      <TeamStats team={gameDetails.roadclub} />
+      <QuarterScores
+        localTeam={gameDetails.localclub}
+        roadTeam={gameDetails.roadclub}
+      />
+
+      <div className="space-y-4">
+        <TeamStats team={gameDetails.localclub} />
+        <TeamStats team={gameDetails.roadclub} />
+      </div>
     </div>
   );
 };

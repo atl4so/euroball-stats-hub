@@ -1,4 +1,4 @@
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 
 interface GameStatusProps {
   played: boolean;
@@ -6,12 +6,14 @@ interface GameStatusProps {
 
 export const GameStatus = ({ played }: GameStatusProps) => {
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle>Game Status</CardTitle>
-      </CardHeader>
-      <CardContent>
-        <p><span className="font-semibold">Status:</span> {played ? 'Completed' : 'Scheduled'}</p>
+    <Card className="h-full">
+      <CardContent className="p-4">
+        <p className="text-sm">
+          <span className="font-medium">Status:</span>{' '}
+          <span className={played ? 'text-green-600' : 'text-yellow-600'}>
+            {played ? 'Completed' : 'Scheduled'}
+          </span>
+        </p>
       </CardContent>
     </Card>
   );
