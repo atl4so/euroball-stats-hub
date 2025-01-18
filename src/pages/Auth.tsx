@@ -19,8 +19,6 @@ const Auth = () => {
   const [username, setUsername] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [email, setEmail] = useState<string | null>(null);
-  const [showResendButton, setShowResendButton] = useState(false);
 
   // Get the current domain for the redirect URL
   const redirectTo = `${window.location.origin}/auth/callback`;
@@ -53,10 +51,6 @@ const Auth = () => {
           }
         } else if (event === 'SIGNED_OUT') {
           setError(null);
-          setEmail(null);
-          setShowResendButton(false);
-        } else if (event === 'USER_UPDATED') {
-          setShowResendButton(true);
         }
       }
     );
@@ -100,43 +94,6 @@ const Auth = () => {
     }
   };
 
-  const handleResendConfirmation = async () => {
-    if (!email) {
-      toast({
-        variant: "destructive",
-        title: "Error",
-        description: "No email address found",
-      });
-      return;
-    }
-
-    try {
-      setLoading(true);
-      const { error } = await supabase.auth.resend({
-        type: 'signup',
-        email: email,
-        options: {
-          emailRedirectTo: redirectTo,
-        },
-      });
-
-      if (error) throw error;
-
-      toast({
-        title: "Confirmation email sent",
-        description: "Please check your email for the confirmation link",
-      });
-    } catch (error: any) {
-      toast({
-        variant: "destructive",
-        title: "Error sending confirmation",
-        description: error.message,
-      });
-    } finally {
-      setLoading(false);
-    }
-  };
-
   const getErrorMessage = (error: AuthError) => {
     if (error instanceof AuthApiError) {
       switch (error.status) {
@@ -156,23 +113,12 @@ const Auth = () => {
       if (event === 'USER_UPDATED' && !session) {
         setError("Authentication failed. Please try again.");
       }
-      if (event === 'SIGNED_UP') {
-        const emailFromSession = session?.user?.email;
-        if (emailFromSession) {
-          setEmail(emailFromSession);
-          setShowResendButton(true);
-          toast({
-            title: "Confirmation email sent",
-            description: "Please check your email for the confirmation link",
-          });
-        }
-      }
     });
 
     return () => {
       handleAuthError.data.subscription.unsubscribe();
     };
-  }, [toast]);
+  }, []);
 
   if (showUsernameForm) {
     return (
@@ -240,21 +186,6 @@ const Auth = () => {
           <Alert variant="destructive" className="mb-4">
             <AlertDescription>{error}</AlertDescription>
           </Alert>
-        )}
-
-        {showResendButton && (
-          <div className="text-center space-y-2">
-            <p className="text-sm text-muted-foreground">
-              Didn't receive the confirmation email?
-            </p>
-            <Button
-              variant="outline"
-              onClick={handleResendConfirmation}
-              disabled={loading}
-            >
-              Resend confirmation email
-            </Button>
-          </div>
         )}
 
         <div className="bg-card p-6 rounded-lg shadow-sm border">
