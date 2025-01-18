@@ -101,3 +101,34 @@ export interface GameDetails {
   localclub: TeamStats;
   roadclub: TeamStats;
 }
+
+export interface PlayerDetails {
+  name: string;
+  height: number;
+  birthDate: string;
+  country: string;
+  imageUrl: string;
+  imageHorizontalUrl: string;
+  clubCode: string;
+  clubName: string;
+  dorsal: string;
+  position: string;
+  score: number;
+  timePlayed: string;
+  valuation: number;
+  totalRebounds: number;
+  offensiveRebounds: number;
+  defensiveRebounds: number;
+  assistances: number;
+  steals: number;
+  turnovers: number;
+  blocksAgainst: number;
+  blocksFavour: number;
+  fieldGoals2Percent: string;
+  fieldGoals3Percent: string;
+  freeThrowsPercent: string;
+  foulsCommited: number;
+  foulsReceived: number;
+  career: string;
+  misc: string;
+}

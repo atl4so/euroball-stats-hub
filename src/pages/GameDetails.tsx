@@ -1,5 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import { fetchGameDetails } from "@/services/euroleagueApi";
 import { format } from "date-fns";
 import {
@@ -12,16 +12,22 @@ import {
 } from "@/components/ui/table";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
 import { PlayerStat } from "@/types/euroleague";
 
 const GameDetails = () => {
   const { gameCode } = useParams();
+  const navigate = useNavigate();
   
   const { data: gameDetails, isLoading } = useQuery({
     queryKey: ["gameDetails", gameCode],
     queryFn: () => fetchGameDetails("E2024", parseInt(gameCode || "0")),
     enabled: !!gameCode
   });
+
+  const handlePlayerClick = (playerCode: string) => {
+    navigate(`/player/${playerCode}`);
+  };
 
   if (isLoading) {
     return (
@@ -57,8 +63,14 @@ const GameDetails = () => {
         {stats.filter(player => player.PlayerName !== "Team").map((player) => (
           <TableRow key={player.PlayerCode}>
             <TableCell className="font-medium">
-              {player.PlayerName}
-              {player.StartFive && " *"}
+              <Button 
+                variant="link" 
+                className="p-0 h-auto font-medium"
+                onClick={() => handlePlayerClick(player.PlayerCode)}
+              >
+                {player.PlayerName}
+                {player.StartFive && " *"}
+              </Button>
             </TableCell>
             <TableCell className="text-right">{player.TimePlayed}</TableCell>
             <TableCell className="text-right">{player.Score}</TableCell>

@@ -164,3 +164,55 @@ export const fetchGameDetails = async (seasonCode: string, gameCode: number): Pr
     throw error;
   }
 };
+
+export const fetchPlayerDetails = async (playerCode: string, seasonCode: string): Promise<PlayerDetails> => {
+  try {
+    const response = await fetch(
+      `${BASE_URL}/players?playerCode=${playerCode}&seasonCode=${seasonCode}`
+    );
+    
+    if (!response.ok) {
+      throw new Error("Failed to fetch player details");
+    }
+    
+    const data = await response.text();
+    const parser = new DOMParser();
+    const xmlDoc = parser.parseFromString(data, "text/xml");
+    
+    const player = xmlDoc.getElementsByTagName("SeasonPlayerModel")[0];
+    
+    return {
+      name: player.getElementsByTagName("name")[0]?.textContent || "",
+      height: parseInt(player.getElementsByTagName("height")[0]?.textContent || "0"),
+      birthDate: player.getElementsByTagName("birthDate")[0]?.textContent || "",
+      country: player.getElementsByTagName("country")[0]?.textContent || "",
+      imageUrl: player.getElementsByTagName("imageUrl")[0]?.textContent || "",
+      imageHorizontalUrl: player.getElementsByTagName("imageHorizontalUrl")[0]?.textContent || "",
+      clubCode: player.getElementsByTagName("clubCode")[0]?.textContent || "",
+      clubName: player.getElementsByTagName("clubName")[0]?.textContent || "",
+      dorsal: player.getElementsByTagName("dorsal")[0]?.textContent || "",
+      position: player.getElementsByTagName("position")[0]?.textContent || "",
+      score: parseInt(player.getElementsByTagName("score")[0]?.textContent || "0"),
+      timePlayed: player.getElementsByTagName("timePlayed")[0]?.textContent || "",
+      valuation: parseInt(player.getElementsByTagName("valuation")[0]?.textContent || "0"),
+      totalRebounds: parseInt(player.getElementsByTagName("totalRebounds")[0]?.textContent || "0"),
+      offensiveRebounds: parseInt(player.getElementsByTagName("offensiveRebounds")[0]?.textContent || "0"),
+      defensiveRebounds: parseInt(player.getElementsByTagName("defensiveRebounds")[0]?.textContent || "0"),
+      assistances: parseInt(player.getElementsByTagName("assistances")[0]?.textContent || "0"),
+      steals: parseInt(player.getElementsByTagName("steals")[0]?.textContent || "0"),
+      turnovers: parseInt(player.getElementsByTagName("turnovers")[0]?.textContent || "0"),
+      blocksAgainst: parseInt(player.getElementsByTagName("blocksAgainst")[0]?.textContent || "0"),
+      blocksFavour: parseInt(player.getElementsByTagName("blocksFavour")[0]?.textContent || "0"),
+      fieldGoals2Percent: player.getElementsByTagName("fieldGoals2Percent")[0]?.textContent || "",
+      fieldGoals3Percent: player.getElementsByTagName("fieldGoals3Percent")[0]?.textContent || "",
+      freeThrowsPercent: player.getElementsByTagName("freeThrowsPercent")[0]?.textContent || "",
+      foulsCommited: parseInt(player.getElementsByTagName("foulsCommited")[0]?.textContent || "0"),
+      foulsReceived: parseInt(player.getElementsByTagName("foulsReceived")[0]?.textContent || "0"),
+      career: player.getElementsByTagName("career")[0]?.textContent || "",
+      misc: player.getElementsByTagName("misc")[0]?.textContent || ""
+    };
+  } catch (error) {
+    console.error("Error fetching player details:", error);
+    throw error;
+  }
+};
