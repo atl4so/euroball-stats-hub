@@ -13,16 +13,8 @@ const Index = () => {
     queryFn: () => fetchResults("E2024", gameday)
   });
 
-  const handlePrevRound = () => {
-    if (gameday > 1) {
-      setGameday(prev => prev - 1);
-    }
-  };
-
-  const handleNextRound = () => {
-    if (gameday < 34) {
-      setGameday(prev => prev + 1);
-    }
+  const handlePageChange = (page: number) => {
+    setGameday(page);
   };
 
   return (
@@ -35,7 +27,7 @@ const Index = () => {
             <Button
               variant="outline"
               size="sm"
-              onClick={handlePrevRound}
+              onClick={() => handlePageChange(gameday - 1)}
               disabled={gameday <= 1}
             >
               <ChevronLeft className="h-4 w-4" />
@@ -49,7 +41,7 @@ const Index = () => {
             <Button
               variant="outline"
               size="sm"
-              onClick={handleNextRound}
+              onClick={() => handlePageChange(gameday + 1)}
               disabled={gameday >= 34}
             >
               Next
@@ -63,6 +55,8 @@ const Index = () => {
         <GameList
           games={data?.game || []}
           isLoading={isLoading}
+          currentRound={gameday}
+          onPageChange={handlePageChange}
         />
       </main>
     </div>
