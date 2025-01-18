@@ -19,7 +19,11 @@ interface GameListProps {
 
 const CURRENT_ROUND = 22; // Last completed round
 
+import { useNavigate } from "react-router-dom";
+
 export const GameList = ({ games, isLoading, currentRound, onPageChange }: GameListProps) => {
+  const navigate = useNavigate();
+
   if (isLoading) {
     return (
       <div className="space-y-4 p-4">
@@ -60,7 +64,8 @@ export const GameList = ({ games, isLoading, currentRound, onPageChange }: GameL
           <motion.div
             key={game.gamecode}
             variants={item}
-            className="game-list-item bg-card rounded-lg p-4 shadow-sm"
+            className="game-list-item bg-card hover:bg-accent rounded-lg p-4 shadow-sm cursor-pointer transition-colors"
+            onClick={() => navigate(`/game/${game.gamenumber}`)}
           >
             <div className="flex justify-between items-center">
               <div className="text-sm text-muted-foreground">
