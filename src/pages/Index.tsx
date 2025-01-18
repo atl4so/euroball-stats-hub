@@ -1,16 +1,23 @@
 import { useQuery } from "@tanstack/react-query";
-import { fetchResults } from "@/services/euroleagueApi";
+import { fetchResults, fetchSchedule } from "@/services/euroleagueApi";
 import { GameList } from "@/components/GameList";
+import { ScheduleList } from "@/components/ScheduleList";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { ChevronLeft, ChevronRight } from "lucide-react";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 const Index = () => {
   const [gameday, setGameday] = useState(22);
   
-  const { data, isLoading } = useQuery({
+  const { data: resultsData, isLoading: isLoadingResults } = useQuery({
     queryKey: ["results", gameday],
     queryFn: () => fetchResults("E2024", gameday)
+  });
+
+  const { data: scheduleData, isLoading: isLoadingSchedule } = useQuery({
+    queryKey: ["schedule", gameday + 1],
+    queryFn: () => fetchSchedule("E2024", gameday + 1)
   });
 
   const handlePageChange = (page: number) => {
@@ -21,7 +28,7 @@ const Index = () => {
     <div className="min-h-screen bg-background">
       <header className="sticky top-0 z-10 bg-background/80 backdrop-blur-sm border-b">
         <div className="container mx-auto px-4 py-4">
-          <h1 className="text-2xl font-bold text-center mb-4">Euroleague Results</h1>
+          <h1 className="text-2xl font-bold text-center mb-4">Euroleague Games</h1>
           
           <div className="flex justify-center items-center gap-4">
             <Button
@@ -52,12 +59,26 @@ const Index = () => {
       </header>
 
       <main className="container mx-auto max-w-2xl">
-        <GameList
-          games={data?.game || []}
-          isLoading={isLoading}
-          currentRound={gameday}
-          onPageChange={handlePageChange}
-        />
+        <Tabs defaultValue="results" className="mt-4">
+          <TabsList className="grid w-full grid-cols-2">
+            <TabsTrigger value="results">Results</TabsTrigger>
+            <TabsTrigger value="schedule">Upcoming Games</TabsTrigger>
+          </TabsList>
+          <TabsContent value="results">
+            <GameList
+              games={resultsData?.game || []}
+              isLoading={isLoadingResults}
+              currentRound={gameday}
+              onPageChange={handlePageChange}
+            />
+          </TabsContent>
+          <TabsContent value="schedule">
+            <ScheduleList
+              schedules={scheduleData?.item || []}
+              isLoading={isLoadingSchedule}
+            />
+          </TabsContent>
+        </Tabs>
       </main>
     </div>
   );

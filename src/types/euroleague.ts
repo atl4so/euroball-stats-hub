@@ -18,3 +18,30 @@ export interface Game {
 export interface ResultsResponse {
   game: Game[];
 }
+
+export interface ScheduleItem {
+  gameday: number;
+  round: string;
+  arenacode: string;
+  arenaname: string;
+  arenacapacity: number;
+  date: string;
+  startime: string;
+  endtime: string;
+  group: string;
+  game: number;
+  gamecode: string;
+  hometeam: string;
+  homecode: string;
+  hometv: string;
+  awayteam: string;
+  awaycode: string;
+  awaytv: string;
+  confirmeddate: boolean;
+  confirmedtime: boolean;
+  played: boolean;
+}
+
+export interface ScheduleResponse {
+  item: ScheduleItem[];
+}
