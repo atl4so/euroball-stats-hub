@@ -1,128 +1,202 @@
+import { useParams } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
-import { useParams, Link } from "react-router-dom";
 import { fetchPlayerDetails } from "@/services/euroleagueApi";
-import { format } from "date-fns";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Skeleton } from "@/components/ui/skeleton";
-import {
-  Breadcrumb,
-  BreadcrumbItem,
-  BreadcrumbLink,
-  BreadcrumbList,
-  BreadcrumbPage,
-  BreadcrumbSeparator,
-} from "@/components/ui/breadcrumb";
+import { format } from "date-fns";
 import { useEffect } from "react";
+import { PageBreadcrumb } from "@/components/PageBreadcrumb";
 
 const PlayerDetails = () => {
   const { playerCode } = useParams();
-  
-  const { data: playerDetails, isLoading } = useQuery({
+  const { data: playerDetails, isLoading, error } = useQuery({
     queryKey: ["playerDetails", playerCode],
-    queryFn: () => fetchPlayerDetails(playerCode || "", "E2024"),
-    enabled: !!playerCode
+    queryFn: () => {
+      if (!playerCode) {
+        throw new Error("Player code is required");
+      }
+      return fetchPlayerDetails(playerCode, "E2024");
+    },
+    enabled: !!playerCode,
   });
 
   useEffect(() => {
     if (playerDetails) {
-      document.title = `${playerDetails.name} - ${playerDetails.clubName} Player Profile`;
+      document.title = `${playerDetails.name} - Euroball Stats Hub`;
     }
   }, [playerDetails]);
 
-  if (isLoading) {
-    return (
-      <div className="container mx-auto p-4 space-y-4">
-        <Skeleton className="h-8 w-full max-w-md" />
-        <Skeleton className="h-[200px] w-full" />
-        <Skeleton className="h-[400px] w-full" />
-      </div>
-    );
-  }
+  if (isLoading) return <div className="p-4">Loading...</div>;
+  if (error) return <div className="p-4">Error loading player details: {error.message}</div>;
+  if (!playerDetails) return <div className="p-4">No player details found</div>;
 
-  if (!playerDetails) return null;
+  // Convert minutes played from MM:SS format to average minutes
+  const getAverageMinutes = (timePlayed: string) => {
+    const [minutes, seconds] = timePlayed.split(":").map(Number);
+    const totalMinutes = minutes + seconds / 60;
+    return totalMinutes.toFixed(1);
+  };
+
+  const breadcrumbItems = [
+    { label: "Teams", path: "/teams" },
+    { label: playerDetails.clubName, path: `/team/${playerDetails.clubCode}` },
+    { label: playerDetails.name, path: `/player/${playerCode}` },
+  ];
 
   return (
-    <div className="container mx-auto p-4 space-y-6">
-      <Breadcrumb>
-        <BreadcrumbList>
-          <BreadcrumbItem>
-            <BreadcrumbLink asChild>
-              <Link to="/">Home</Link>
-            </BreadcrumbLink>
-          </BreadcrumbItem>
-          <BreadcrumbSeparator />
-          <BreadcrumbItem>
-            <BreadcrumbPage>{playerDetails.name}</BreadcrumbPage>
-          </BreadcrumbItem>
-        </BreadcrumbList>
-      </Breadcrumb>
+    <div>
+      <PageBreadcrumb items={breadcrumbItems} />
+      
+      <div className="container mx-auto px-4 py-6 space-y-6 max-w-7xl">
+        <div className="space-y-4">
+          <h1 className="text-3xl font-bold tracking-tight text-gray-900 dark:text-gray-100">
+            {playerDetails.name}
+          </h1>
+          <div className="flex flex-wrap gap-2">
+            <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200">
+              {playerDetails.clubName}
+            </span>
+            <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200">
+              #{playerDetails.dorsal}
+            </span>
+            <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-emerald-100 text-emerald-800 dark:bg-emerald-900 dark:text-emerald-200">
+              {playerDetails.position}
+            </span>
+          </div>
+        </div>
 
-      <div className="text-center space-y-2">
-        <h1 className="text-2xl font-bold">{playerDetails.name}</h1>
-        <p className="text-muted-foreground">
-          {playerDetails.clubName} • #{playerDetails.dorsal}
-        </p>
-      </div>
-
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <Card>
-          <CardHeader>
-            <CardTitle>Personal Information</CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-2">
-            <div className="flex justify-center mb-4">
-              <img 
-                src={playerDetails.imageUrl} 
-                alt={playerDetails.name}
-                className="rounded-lg max-h-[300px]"
-              />
-            </div>
-            <p><span className="font-semibold">Height:</span> {playerDetails.height}cm</p>
-            <p><span className="font-semibold">Birth Date:</span> {format(new Date(playerDetails.birthDate), "MMMM d, yyyy")}</p>
-            <p><span className="font-semibold">Country:</span> {playerDetails.country}</p>
-            <p><span className="font-semibold">Position:</span> {playerDetails.position}</p>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader>
-            <CardTitle>Season Statistics</CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-2">
-            <p><span className="font-semibold">Average Time Played:</span> {playerDetails.timePlayed}</p>
-            <p><span className="font-semibold">Points Per Game:</span> {playerDetails.score}</p>
-            <p><span className="font-semibold">Rebounds Per Game:</span> {playerDetails.totalRebounds}</p>
-            <p><span className="font-semibold">Assists Per Game:</span> {playerDetails.assistances}</p>
-            <p><span className="font-semibold">Steals Per Game:</span> {playerDetails.steals}</p>
-            <p><span className="font-semibold">Blocks Per Game:</span> {playerDetails.blocksFavour}</p>
-            <p><span className="font-semibold">PIR Per Game:</span> {playerDetails.valuation}</p>
-            <p><span className="font-semibold">2PT%:</span> {playerDetails.fieldGoals2Percent}</p>
-            <p><span className="font-semibold">3PT%:</span> {playerDetails.fieldGoals3Percent}</p>
-            <p><span className="font-semibold">FT%:</span> {playerDetails.freeThrowsPercent}</p>
-          </CardContent>
-        </Card>
-
-        {(playerDetails.career || playerDetails.misc) && (
-          <Card className="md:col-span-2">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <Card className="bg-gradient-to-br from-blue-50 to-indigo-50 dark:from-blue-950 dark:to-indigo-950 border-0 shadow-lg">
             <CardHeader>
-              <CardTitle>Career & Additional Information</CardTitle>
+              <CardTitle className="text-lg font-semibold text-gray-900 dark:text-gray-100">
+                Personal Information
+              </CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
-              {playerDetails.career && (
+              <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <h3 className="font-semibold mb-2">Career</h3>
-                  <p>{playerDetails.career}</p>
+                  <div className="text-sm font-medium text-gray-500 dark:text-gray-400">Height</div>
+                  <div className="text-base text-gray-900 dark:text-gray-100">
+                    {playerDetails.height} cm
+                  </div>
                 </div>
-              )}
-              {playerDetails.misc && (
                 <div>
-                  <h3 className="font-semibold mb-2">Additional Information</h3>
-                  <p>{playerDetails.misc}</p>
+                  <div className="text-sm font-medium text-gray-500 dark:text-gray-400">Nationality</div>
+                  <div className="text-base text-gray-900 dark:text-gray-100">
+                    {playerDetails.country}
+                  </div>
                 </div>
-              )}
+                <div className="col-span-2">
+                  <div className="text-sm font-medium text-gray-500 dark:text-gray-400">Date of Birth</div>
+                  <div className="text-base text-gray-900 dark:text-gray-100">
+                    {format(new Date(playerDetails.birthDate), "MMMM d, yyyy")}
+                  </div>
+                </div>
+              </div>
             </CardContent>
           </Card>
-        )}
+
+          <Card className="md:col-span-2 bg-gradient-to-br from-purple-50 to-pink-50 dark:from-purple-950 dark:to-pink-950 border-0 shadow-lg">
+            <CardHeader>
+              <CardTitle className="text-lg font-semibold text-gray-900 dark:text-gray-100">
+                Key Statistics
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="grid grid-cols-3 gap-6">
+                <div className="bg-white/50 dark:bg-white/5 rounded-lg p-3 text-center">
+                  <div className="text-2xl font-bold text-purple-600 dark:text-purple-400">
+                    {playerDetails.score}
+                  </div>
+                  <div className="text-sm font-medium text-gray-600 dark:text-gray-300">PPG</div>
+                </div>
+                <div className="bg-white/50 dark:bg-white/5 rounded-lg p-3 text-center">
+                  <div className="text-2xl font-bold text-pink-600 dark:text-pink-400">
+                    {playerDetails.valuation}
+                  </div>
+                  <div className="text-sm font-medium text-gray-600 dark:text-gray-300">PIR</div>
+                </div>
+                <div className="bg-white/50 dark:bg-white/5 rounded-lg p-3 text-center">
+                  <div className="text-2xl font-bold text-blue-600 dark:text-blue-400">
+                    {getAverageMinutes(playerDetails.timePlayed)}
+                  </div>
+                  <div className="text-sm font-medium text-gray-600 dark:text-gray-300">Minutes</div>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card className="md:col-span-3 bg-gradient-to-br from-emerald-50 to-teal-50 dark:from-emerald-950 dark:to-teal-950 border-0 shadow-lg">
+            <CardHeader>
+              <CardTitle className="text-lg font-semibold text-gray-900 dark:text-gray-100">
+                Detailed Statistics
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-6">
+                <div className="bg-white/50 dark:bg-white/5 rounded-lg p-3">
+                  <div className="text-sm font-medium text-gray-500 dark:text-gray-400 mb-1">2PT%</div>
+                  <div className="text-lg font-semibold text-emerald-600 dark:text-emerald-400">
+                    {playerDetails.fieldGoals2Percent}%
+                  </div>
+                </div>
+                <div className="bg-white/50 dark:bg-white/5 rounded-lg p-3">
+                  <div className="text-sm font-medium text-gray-500 dark:text-gray-400 mb-1">3PT%</div>
+                  <div className="text-lg font-semibold text-teal-600 dark:text-teal-400">
+                    {playerDetails.fieldGoals3Percent}%
+                  </div>
+                </div>
+                <div className="bg-white/50 dark:bg-white/5 rounded-lg p-3">
+                  <div className="text-sm font-medium text-gray-500 dark:text-gray-400 mb-1">FT%</div>
+                  <div className="text-lg font-semibold text-cyan-600 dark:text-cyan-400">
+                    {playerDetails.freeThrowsPercent}%
+                  </div>
+                </div>
+                <div className="bg-white/50 dark:bg-white/5 rounded-lg p-3">
+                  <div className="text-sm font-medium text-gray-500 dark:text-gray-400 mb-1">Rebounds</div>
+                  <div className="text-lg font-semibold text-emerald-600 dark:text-emerald-400">
+                    {playerDetails.totalRebounds}
+                  </div>
+                </div>
+                <div className="bg-white/50 dark:bg-white/5 rounded-lg p-3">
+                  <div className="text-sm font-medium text-gray-500 dark:text-gray-400 mb-1">Assists</div>
+                  <div className="text-lg font-semibold text-teal-600 dark:text-teal-400">
+                    {playerDetails.assistances}
+                  </div>
+                </div>
+                <div className="bg-white/50 dark:bg-white/5 rounded-lg p-3">
+                  <div className="text-sm font-medium text-gray-500 dark:text-gray-400 mb-1">Steals</div>
+                  <div className="text-lg font-semibold text-cyan-600 dark:text-cyan-400">
+                    {playerDetails.steals}
+                  </div>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          {(playerDetails.career || playerDetails.misc) && (
+            <Card className="md:col-span-3 bg-gradient-to-br from-orange-50 to-amber-50 dark:from-orange-950 dark:to-amber-950 border-0 shadow-lg">
+              <CardHeader>
+                <CardTitle className="text-lg font-semibold text-gray-900 dark:text-gray-100">
+                  Career Information
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-6">
+                {playerDetails.career && (
+                  <div>
+                    <h3 className="text-sm font-medium text-gray-500 dark:text-gray-400 mb-2">Career History</h3>
+                    <p className="text-gray-900 dark:text-gray-100">{playerDetails.career}</p>
+                  </div>
+                )}
+                {playerDetails.misc && (
+                  <div>
+                    <h3 className="text-sm font-medium text-gray-500 dark:text-gray-400 mb-2">Additional Information</h3>
+                    <p className="text-gray-900 dark:text-gray-100">{playerDetails.misc}</p>
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+          )}
+        </div>
       </div>
     </div>
   );

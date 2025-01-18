@@ -1,10 +1,12 @@
+import { Link } from "react-router-dom";
 import { ScheduleItem } from "@/types/euroleague";
-import { format } from "date-fns";
 import { motion } from "framer-motion";
+import { format } from "date-fns";
 import { MapPin } from "lucide-react";
 import {
   Pagination,
   PaginationContent,
+  PaginationEllipsis,
   PaginationItem,
   PaginationLink,
   PaginationNext,
@@ -15,128 +17,120 @@ interface ScheduleListProps {
   schedules: ScheduleItem[];
   isLoading: boolean;
   currentRound: number;
-  onPageChange: (page: number) => void;
+  onPageChange: (round: number) => void;
 }
 
-const CURRENT_ROUND = 22; // Last completed round
-const FINAL_ROUND = 34; // Total rounds in the season
+const container = {
+  hidden: { opacity: 0 },
+  show: {
+    opacity: 1,
+    transition: {
+      staggerChildren: 0.1
+    }
+  }
+};
+
+const item = {
+  hidden: { opacity: 0, y: 20 },
+  show: { opacity: 1, y: 0 }
+};
 
 export const ScheduleList = ({ schedules, isLoading, currentRound, onPageChange }: ScheduleListProps) => {
   if (isLoading) {
-    return (
-      <div className="space-y-4 p-4">
-        {[1, 2, 3, 4].map((i) => (
-          <div
-            key={i}
-            className="h-24 bg-muted animate-pulse rounded-lg"
-          />
-        ))}
-      </div>
-    );
+    return <div className="p-4 text-center text-gray-500 dark:text-gray-400">Loading schedules...</div>;
   }
 
-  const container = {
-    hidden: { opacity: 0 },
-    show: {
-      opacity: 1,
-      transition: {
-        staggerChildren: 0.1
-      }
-    }
-  };
-
-  const item = {
-    hidden: { opacity: 0, y: 20 },
-    show: { opacity: 1, y: 0 }
-  };
+  if (!schedules.length) {
+    return <div className="p-4 text-center text-gray-500 dark:text-gray-400">No schedules found</div>;
+  }
 
   return (
-    <div className="space-y-6">
-      <motion.div
-        variants={container}
-        initial="hidden"
-        animate="show"
-        className="space-y-3 p-4"
-      >
-        {schedules.map((schedule) => (
+    <motion.div
+      variants={container}
+      initial="hidden"
+      animate="show"
+      className="divide-y divide-gray-200 dark:divide-gray-800"
+    >
+      {schedules.map((schedule) => (
+        <Link to={`/game/${schedule.game}`} key={schedule.gamecode} className="block p-3 sm:p-4">
           <motion.div
-            key={schedule.gamecode}
             variants={item}
-            className="game-list-item bg-card rounded-lg p-4 shadow-sm"
+            className="block hover:bg-blue-50/50 dark:hover:bg-blue-900/20 transition-colors"
           >
-            <div className="flex justify-between items-center">
-              <div className="text-sm text-muted-foreground">
-                {format(new Date(schedule.date), "MMM d, yyyy")} • {schedule.startime}
+            <div className="block">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-2 gap-2">
+                <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200 w-fit">
+                  UPCOMING
+                </span>
+                <div className="text-xs sm:text-sm text-gray-500 dark:text-gray-400">
+                  {format(new Date(schedule.date), "MMM d, yyyy")} {schedule.startime}
+                </div>
               </div>
-              <div className="text-xs font-medium bg-secondary px-2 py-1 rounded-full">
-                Round {schedule.gameday}
-              </div>
-            </div>
-            
-            <div className="mt-2 grid grid-cols-[1fr,auto,1fr] gap-4 items-center">
-              <div className="text-right">
-                <div className="font-medium">{schedule.hometeam}</div>
-                <div className="text-sm text-muted-foreground">{schedule.homecode}</div>
-              </div>
-              
-              <div className="text-sm text-muted-foreground">vs</div>
-              
-              <div>
-                <div className="font-medium">{schedule.awayteam}</div>
-                <div className="text-sm text-muted-foreground">{schedule.awaycode}</div>
-              </div>
-            </div>
 
-            <div className="mt-3 flex items-center gap-1 text-sm text-muted-foreground">
-              <MapPin className="h-4 w-4" />
-              <span>{schedule.arenaname}</span>
+              <div className="grid grid-cols-[1fr,auto,1fr] sm:grid-cols-3 gap-2 sm:gap-4 items-center">
+                <div className="text-right">
+                  <div className="font-medium text-sm sm:text-base text-gray-900 dark:text-gray-100">{schedule.hometeam}</div>
+                  <div className="text-xl sm:text-2xl font-bold tabular-nums text-gray-600 dark:text-gray-400">
+                    -
+                  </div>
+                </div>
+
+                <div className="text-center text-xs sm:text-sm font-medium text-gray-500 dark:text-gray-400 px-1">
+                  vs
+                </div>
+
+                <div className="text-left">
+                  <div className="font-medium text-sm sm:text-base text-gray-900 dark:text-gray-100">{schedule.awayteam}</div>
+                  <div className="text-xl sm:text-2xl font-bold tabular-nums text-gray-600 dark:text-gray-400">
+                    -
+                  </div>
+                </div>
+              </div>
+
+              <div className="mt-3 flex items-center gap-1 text-xs sm:text-sm text-gray-500 dark:text-gray-400">
+                <MapPin className="h-3 w-3 sm:h-4 sm:w-4 flex-shrink-0" />
+                <span className="truncate">{schedule.arenaname}</span>
+              </div>
             </div>
           </motion.div>
-        ))}
-      </motion.div>
+        </Link>
+      ))}
 
       {schedules.length > 0 && (
         <Pagination className="py-4">
-          <PaginationContent>
+          <PaginationContent className="flex-wrap justify-center gap-1">
             <PaginationItem>
-              <PaginationPrevious 
-                href="#" 
-                onClick={(e) => {
-                  e.preventDefault();
-                  if (currentRound > CURRENT_ROUND + 1) onPageChange(currentRound - 1);
-                }}
-                className={currentRound <= CURRENT_ROUND + 1 ? "pointer-events-none opacity-50" : ""}
+              <PaginationPrevious
+                onClick={() => onPageChange(currentRound - 1)}
+                className="cursor-pointer"
               />
             </PaginationItem>
-            
-            {Array.from({ length: FINAL_ROUND - CURRENT_ROUND }, (_, i) => i + CURRENT_ROUND + 1).map((round) => (
-              <PaginationItem key={round} className="hidden md:inline-block">
+
+            {Array.from({ length: 3 }, (_, i) => currentRound - 1 + i).map((round) => (
+              <PaginationItem key={round}>
                 <PaginationLink
-                  href="#"
-                  onClick={(e) => {
-                    e.preventDefault();
-                    onPageChange(round);
-                  }}
-                  isActive={currentRound === round}
+                  onClick={() => onPageChange(round)}
+                  isActive={round === currentRound}
+                  className="cursor-pointer"
                 >
                   {round}
                 </PaginationLink>
               </PaginationItem>
             ))}
-            
+
             <PaginationItem>
-              <PaginationNext 
-                href="#" 
-                onClick={(e) => {
-                  e.preventDefault();
-                  if (currentRound < FINAL_ROUND) onPageChange(currentRound + 1);
-                }}
-                className={currentRound >= FINAL_ROUND ? "pointer-events-none opacity-50" : ""}
+              <PaginationEllipsis />
+            </PaginationItem>
+
+            <PaginationItem>
+              <PaginationNext
+                onClick={() => onPageChange(currentRound + 1)}
+                className="cursor-pointer"
               />
             </PaginationItem>
           </PaginationContent>
         </Pagination>
       )}
-    </div>
+    </motion.div>
   );
 };

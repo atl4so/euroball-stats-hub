@@ -1,6 +1,15 @@
 import { ResultsResponse, ScheduleResponse, PlayerDetails, GameDetails, TeamStats } from "@/types/euroleague";
+import { xmlToJson } from "@/utils/xmlParser";
+import { TeamsResponse } from "@/types/team";
 
 const BASE_URL = "https://api-live.euroleague.net/v1";
+
+const defaultHeaders = {
+  "Accept": "application/json",
+  "Content-Type": "application/json",
+  "Origin": "https://www.euroleague.net",
+  "Referer": "https://www.euroleague.net/",
+};
 
 export const fetchResults = async (seasonCode: string, gameNumber: number): Promise<ResultsResponse> => {
   try {
@@ -218,4 +227,202 @@ export const fetchPlayerDetails = async (playerCode: string, seasonCode: string)
     console.error("Error fetching player details:", error);
     throw error;
   }
+};
+
+export const fetchTeams = async (seasonCode: string): Promise<TeamsResponse> => {
+  try {
+    const response = await fetch(
+      `${BASE_URL}/teams?seasonCode=${seasonCode}`,
+      {
+        method: "GET",
+        headers: {
+          "Accept": "application/xml",
+          "Content-Type": "application/xml",
+          "Origin": "https://www.euroleague.net",
+          "Referer": "https://www.euroleague.net/",
+        },
+      }
+    );
+    
+    if (!response.ok) {
+      const errorText = await response.text();
+      console.error("Teams API Error:", errorText);
+      throw new Error(`Failed to fetch teams: ${response.status} ${response.statusText}`);
+    }
+
+    const xmlText = await response.text();
+    console.log("Raw XML response:", xmlText);
+    
+    const parser = new DOMParser();
+    const xmlDoc = parser.parseFromString(xmlText, "text/xml");
+    
+    const clubElements = xmlDoc.getElementsByTagName("club");
+    console.log("Found club elements:", clubElements.length);
+    
+    const clubs = Array.from(clubElements).map(club => {
+      const phaseElement = club.getElementsByTagName("phase")[0];
+      const games = phaseElement ? Array.from(phaseElement.getElementsByTagName("game")).map(game => ({
+        gamenumber: game.getAttribute("gamenumber") || "",
+        confirmeddate: game.getAttribute("confirmeddate") === "true",
+        standingslocalscore: game.getAttribute("standingslocalscore") || "",
+        standingsroadscore: game.getAttribute("standingsroadscore") || "",
+        gamecode: game.getAttribute("gamecode") || "",
+        seasoncode: game.getAttribute("seasoncode") || "",
+        phasetypecode: game.getAttribute("phasetypecode") || "",
+        gamedate: game.getAttribute("gamedate") || "",
+        played: game.getAttribute("played") === "true",
+        win: game.getAttribute("win") || "",
+        tie: game.getAttribute("tie") || "",
+        loss: game.getAttribute("loss") || "",
+        versustype: game.getAttribute("versustype") || "",
+        versus: game.getAttribute("versus") || "",
+      })) : [];
+
+      const rosterElement = club.getElementsByTagName("roster")[0];
+      console.log("Roster element:", rosterElement);
+      
+      const playerElements = rosterElement?.getElementsByTagName("player") || [];
+      console.log("Player elements:", playerElements.length);
+      
+      const players = Array.from(playerElements).map(player => {
+        console.log("Raw player element:", player.outerHTML);
+        return {
+          code: player.getAttribute("code") || "",
+          name: player.getAttribute("name") || "",
+          alias: player.getAttribute("alias") || "",
+          dorsal: player.getAttribute("dorsal") || "",
+          position: player.getAttribute("position") || "",
+          countrycode: player.getAttribute("countrycode") || "",
+          countryname: player.getAttribute("countryname") || "",
+        };
+      });
+      console.log("Parsed players:", players);
+
+      const clubData = {
+        code: club.getAttribute("code") || "",
+        tvcode: club.getAttribute("tvcode") || "",
+        name: club.getElementsByTagName("name")[0]?.textContent || "",
+        clubname: club.getElementsByTagName("clubname")[0]?.textContent || "",
+        clubalias: club.getElementsByTagName("clubalias")[0]?.textContent || "",
+        countrycode: club.getElementsByTagName("countrycode")[0]?.textContent || "",
+        countryname: club.getElementsByTagName("countryname")[0]?.textContent || "",
+        clubaddress: club.getElementsByTagName("clubaddress")[0]?.textContent || "",
+        website: club.getElementsByTagName("website")[0]?.textContent || "",
+        ticketsurl: club.getElementsByTagName("ticketsurl")[0]?.textContent || "",
+        twitteraccount: club.getElementsByTagName("twitteraccount")[0]?.textContent || "",
+        arena: {
+          name: club.getElementsByTagName("arena")[0]?.getAttribute("name") || "",
+        },
+        games: {
+          phase: {
+            code: phaseElement?.getAttribute("code") || "",
+            type: phaseElement?.getAttribute("type") || "",
+            alias: phaseElement?.getAttribute("alias") || "",
+            game: games
+          }
+        },
+        roster: {
+          player: players
+        },
+        coach: {
+          code: club.getElementsByTagName("coach")[0]?.getAttribute("code") || "",
+          name: club.getElementsByTagName("coach")[0]?.getAttribute("name") || "",
+          alias: club.getElementsByTagName("coach")[0]?.getAttribute("alias") || "",
+          countrycode: club.getElementsByTagName("coach")[0]?.getAttribute("countrycode") || "",
+          countryname: club.getElementsByTagName("coach")[0]?.getAttribute("countryname") || "",
+        }
+      };
+      console.log("Parsed club data:", clubData);
+      return clubData;
+    });
+
+    const result = {
+      clubs: {
+        club: clubs
+      }
+    };
+    console.log("Final result:", result);
+    return result;
+  } catch (error) {
+    console.error("Error in fetchTeams:", error);
+    throw error;
+  }
+};
+
+export interface StandingsTeam {
+  name: string;
+  code: string;
+  ranking: number;
+  totalgames: number;
+  wins: number;
+  losses: number;
+  ptsfavour: number;
+  ptsagainst: number;
+  difference: number;
+}
+
+export interface StandingsGroup {
+  name: string;
+  round: string;
+  gamenumber: number;
+  team: StandingsTeam[];
+}
+
+export interface StandingsResponse {
+  standings: {
+    group: {
+      name: string;
+      round: string;
+      gamenumber: number;
+      team: StandingsTeam[];
+    };
+  };
+}
+
+export const fetchStandings = async (seasonCode: string = "E2024", gameNumber: number = 22) => {
+  const params = new URLSearchParams({
+    seasonCode,
+    gameNumber: gameNumber.toString(),
+  });
+
+  const response = await fetch(
+    `https://api-live.euroleague.net/v1/standings?${params}`,
+    {
+      headers: {
+        "Accept": "application/xml",
+      },
+    }
+  );
+
+  if (!response.ok) {
+    throw new Error("Failed to fetch standings");
+  }
+
+  const xmlText = await response.text();
+  const parser = new DOMParser();
+  const xmlDoc = parser.parseFromString(xmlText, "text/xml");
+
+  const teams = Array.from(xmlDoc.getElementsByTagName("team")).map(team => ({
+    name: team.getElementsByTagName("name")[0]?.textContent || "",
+    code: team.getElementsByTagName("code")[0]?.textContent || "",
+    ranking: parseInt(team.getElementsByTagName("ranking")[0]?.textContent || "0"),
+    totalgames: parseInt(team.getElementsByTagName("totalgames")[0]?.textContent || "0"),
+    wins: parseInt(team.getElementsByTagName("wins")[0]?.textContent || "0"),
+    losses: parseInt(team.getElementsByTagName("losses")[0]?.textContent || "0"),
+    ptsfavour: parseInt(team.getElementsByTagName("ptsfavour")[0]?.textContent || "0"),
+    ptsagainst: parseInt(team.getElementsByTagName("ptsagainst")[0]?.textContent || "0"),
+    difference: parseInt(team.getElementsByTagName("difference")[0]?.textContent || "0"),
+  }));
+
+  const group = xmlDoc.getElementsByTagName("group")[0];
+  return {
+    standings: {
+      group: {
+        name: group?.getAttribute("name") || "",
+        round: group?.getAttribute("round") || "",
+        gamenumber: parseInt(group?.getAttribute("gamenumber") || "0"),
+        team: teams,
+      },
+    },
+  } as StandingsResponse;
 };

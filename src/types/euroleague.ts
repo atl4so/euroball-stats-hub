@@ -8,11 +8,13 @@ export interface Game {
   group: string;
   hometeam: string;
   homecode: string;
-  homescore: number;
+  homescore: string;
   awayteam: string;
   awaycode: string;
-  awayscore: number;
+  awayscore: string;
   played: boolean;
+  live?: string;
+  score?: string;
 }
 
 export interface ResultsResponse {
@@ -162,6 +164,8 @@ export interface GameDetails {
   code: string;
   played: boolean;
   cetdate: string;
+  time: string;
+  round: string;
   stadium: string;
   stadiumname: string;
   audience: number;

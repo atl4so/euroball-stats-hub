@@ -2,17 +2,9 @@ import { useQuery } from "@tanstack/react-query";
 import { fetchResults, fetchSchedule } from "@/services/euroleagueApi";
 import { GameList } from "@/components/GameList";
 import { ScheduleList } from "@/components/ScheduleList";
-import { useState } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import { Button } from "@/components/ui/button";
-import { Link } from "react-router-dom";
+import { PageBreadcrumb } from "@/components/PageBreadcrumb";
+import { useState } from "react";
 import { useAuth } from "@/components/AuthProvider";
 import {
   DropdownMenu,
@@ -21,8 +13,12 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { LogOut, User } from "lucide-react";
+import { LogOut, User, Calendar, CheckCircle } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
+import { Button } from "@/components/ui/button";
+import { Link } from "react-router-dom";
+import { Card, CardContent } from "@/components/ui/card";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 const CURRENT_ROUND = 22; // Last completed round
 const NEXT_ROUND = CURRENT_ROUND + 1;
@@ -57,103 +53,142 @@ const Index = () => {
     }
   };
 
-  const handleSignOut = async () => {
-    await supabase.auth.signOut();
-  };
+  const breadcrumbItems = [
+    { label: "Games", path: "/" },
+  ];
 
   return (
-    <div className="min-h-screen bg-background">
-      <header className="sticky top-0 z-10 bg-background/80 backdrop-blur-sm border-b">
-        <div className="container mx-auto px-4 py-4 flex justify-between items-center">
-          <h1 className="text-2xl font-bold">Euroleague Games</h1>
-          <div className="flex items-center gap-4">
-            {user ? (
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button variant="ghost" size="icon">
-                    <User className="h-5 w-5" />
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="end">
-                  <DropdownMenuItem asChild>
-                    <Link to="/profile">Profile Settings</Link>
-                  </DropdownMenuItem>
-                  <DropdownMenuSeparator />
-                  <DropdownMenuItem onClick={handleSignOut}>
-                    <LogOut className="mr-2 h-4 w-4" />
-                    Sign Out
-                  </DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
-            ) : (
-              <Button asChild variant="default">
-                <Link to="/auth">Sign In</Link>
-              </Button>
-            )}
-          </div>
+    <div>
+      <PageBreadcrumb items={breadcrumbItems} />
+      
+      <div className="container mx-auto px-3 sm:px-4 py-4 sm:py-6 max-w-7xl">
+        <div className="mb-6">
+          <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-gray-100">Euroleague 2023-24</h1>
         </div>
-      </header>
 
-      <main className="container mx-auto max-w-2xl">
-        <Tabs defaultValue="results" className="mt-4">
-          <TabsList className="grid w-full grid-cols-2">
-            <TabsTrigger value="results">Results</TabsTrigger>
-            <TabsTrigger value="schedule">Upcoming</TabsTrigger>
-          </TabsList>
-          
-          <TabsContent value="results">
-            <div className="mb-4">
-              <Select
-                value={resultsRound.toString()}
-                onValueChange={(value) => handleResultsPageChange(parseInt(value))}
-              >
-                <SelectTrigger className="w-[180px]">
-                  <SelectValue placeholder="Select round" />
-                </SelectTrigger>
-                <SelectContent>
-                  {Array.from({ length: CURRENT_ROUND }, (_, i) => CURRENT_ROUND - i).map((round) => (
-                    <SelectItem key={round} value={round.toString()}>
-                      Round {round}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+        <Card className="bg-gradient-to-br from-blue-50 to-indigo-50 dark:from-blue-950 dark:to-indigo-950 border-0 shadow-lg overflow-hidden">
+          <CardContent className="p-6">
+            <div className="flex justify-between items-center mb-6">
+              <div>
+                <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-100">Games Center</h2>
+                <p className="text-sm text-gray-500 dark:text-gray-400">View all games and results</p>
+              </div>
+              {user ? (
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button variant="outline" size="icon" className="border-gray-200 dark:border-gray-800">
+                      <User className="h-4 w-4 text-gray-600 dark:text-gray-400" />
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="end" className="w-56">
+                    <DropdownMenuItem disabled className="text-sm text-gray-500 dark:text-gray-400">
+                      <User className="mr-2 h-4 w-4" />
+                      <span>{user.email}</span>
+                    </DropdownMenuItem>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem onClick={() => supabase.auth.signOut()} className="text-red-600 dark:text-red-400">
+                      <LogOut className="mr-2 h-4 w-4" />
+                      <span>Log out</span>
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              ) : (
+                <Button asChild variant="outline" className="border-gray-200 dark:border-gray-800">
+                  <Link to="/auth">Sign In</Link>
+                </Button>
+              )}
             </div>
-            <GameList
-              games={resultsData?.game || []}
-              isLoading={isLoadingResults}
-              currentRound={resultsRound}
-              onPageChange={handleResultsPageChange}
-            />
-          </TabsContent>
-          
-          <TabsContent value="schedule">
-            <div className="mb-4">
-              <Select
-                value={scheduleRound.toString()}
-                onValueChange={(value) => handleSchedulePageChange(parseInt(value))}
-              >
-                <SelectTrigger className="w-[180px]">
-                  <SelectValue placeholder="Select round" />
-                </SelectTrigger>
-                <SelectContent>
-                  {Array.from({ length: FINAL_ROUND - CURRENT_ROUND }, (_, i) => NEXT_ROUND + i).map((round) => (
-                    <SelectItem key={round} value={round.toString()}>
-                      Round {round}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-            <ScheduleList
-              schedules={scheduleData?.item || []}
-              isLoading={isLoadingSchedule}
-              currentRound={scheduleRound}
-              onPageChange={handleSchedulePageChange}
-            />
-          </TabsContent>
-        </Tabs>
-      </main>
+
+            <Tabs defaultValue="results" className="w-full space-y-6">
+              <TabsList className="w-full sm:w-auto mb-4 grid grid-cols-2 sm:flex sm:inline-flex bg-white/50 dark:bg-gray-900/50 border border-gray-200 dark:border-gray-800">
+                <TabsTrigger 
+                  value="results" 
+                  className="data-[state=active]:bg-blue-50 dark:data-[state=active]:bg-blue-900/20 data-[state=active]:text-blue-600 dark:data-[state=active]:text-blue-400 text-sm sm:text-base"
+                >
+                  <CheckCircle className="h-4 w-4 mr-2" />
+                  Results
+                </TabsTrigger>
+                <TabsTrigger 
+                  value="schedule"
+                  className="data-[state=active]:bg-blue-50 dark:data-[state=active]:bg-blue-900/20 data-[state=active]:text-blue-600 dark:data-[state=active]:text-blue-400 text-sm sm:text-base"
+                >
+                  <Calendar className="h-4 w-4 mr-2" />
+                  Schedule
+                </TabsTrigger>
+              </TabsList>
+
+              <TabsContent value="results" className="mt-0">
+                <div className="space-y-4">
+                  <div className="flex justify-between items-center">
+                    <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100">Round {resultsRound}</h3>
+                    <Select
+                      value={resultsRound.toString()}
+                      onValueChange={(value) => handleResultsPageChange(parseInt(value, 10))}
+                    >
+                      <SelectTrigger className="w-[180px] border-gray-200 dark:border-gray-800">
+                        <SelectValue placeholder="Select round" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {Array.from({ length: CURRENT_ROUND }, (_, i) => (
+                          <SelectItem key={i + 1} value={(i + 1).toString()}>
+                            Round {i + 1}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <Card className="border-gray-200 dark:border-gray-800">
+                    <CardContent className="p-0">
+                      <GameList
+                        games={resultsData?.game || []}
+                        isLoading={isLoadingResults}
+                        currentRound={resultsRound}
+                        onPageChange={handleResultsPageChange}
+                      />
+                    </CardContent>
+                  </Card>
+                </div>
+              </TabsContent>
+
+              <TabsContent value="schedule" className="mt-0">
+                <div className="space-y-4">
+                  <div className="flex justify-between items-center">
+                    <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100">Round {scheduleRound}</h3>
+                    <Select
+                      value={scheduleRound.toString()}
+                      onValueChange={(value) => handleSchedulePageChange(parseInt(value, 10))}
+                    >
+                      <SelectTrigger className="w-[180px] border-gray-200 dark:border-gray-800">
+                        <SelectValue placeholder="Select round" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {Array.from({ length: FINAL_ROUND - CURRENT_ROUND }, (_, i) => (
+                          <SelectItem
+                            key={i + NEXT_ROUND}
+                            value={(i + NEXT_ROUND).toString()}
+                          >
+                            Round {i + NEXT_ROUND}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <Card className="border-gray-200 dark:border-gray-800">
+                    <CardContent className="p-0">
+                      <ScheduleList
+                        schedules={scheduleData?.item || []}
+                        isLoading={isLoadingSchedule}
+                        currentRound={scheduleRound}
+                        onPageChange={handleSchedulePageChange}
+                      />
+                    </CardContent>
+                  </Card>
+                </div>
+              </TabsContent>
+            </Tabs>
+          </CardContent>
+        </Card>
+      </div>
     </div>
   );
 };
