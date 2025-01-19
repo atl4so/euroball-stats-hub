@@ -27,9 +27,6 @@ export const GameScore = ({ game }: GameScoreProps) => {
               </span>
             )}
           </div>
-          <div className="text-sm font-medium text-gray-500 dark:text-gray-400">
-            Round {game.gameday}
-          </div>
         </div>
 
         <div className="space-y-6">

@@ -166,6 +166,8 @@ export interface GameDetails {
   cetdate: string;
   time: string;
   round: string;
+  gameday: number;
+  group: string;
   stadium: string;
   stadiumname: string;
   audience: number;

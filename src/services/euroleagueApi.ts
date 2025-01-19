@@ -108,7 +108,15 @@ export const fetchGameDetails = async (gameCode: number, seasonCode: string): Pr
     const xmlDoc = parser.parseFromString(data, "text/xml");
     
     const game = xmlDoc.getElementsByTagName("game")[0];
+    console.log("Game XML attributes:", {
+      round: game.getAttribute("round"),
+      roundElement: game.getElementsByTagName("round")[0]?.textContent,
+      gameday: game.getAttribute("gameday"),
+      group: game.getAttribute("group")
+    });
     
+    const roundText = game.getElementsByTagName("round")[0]?.textContent || game.getAttribute("round") || "";
+
     const parseTeamStats = (teamElement: Element): TeamStats => {
       const playerStats = Array.from(teamElement.getElementsByTagName("stat")).map(stat => ({
         TimePlayed: stat.getElementsByTagName("TimePlayed")[0]?.textContent || "",
@@ -162,6 +170,10 @@ export const fetchGameDetails = async (gameCode: number, seasonCode: string): Pr
       code: game.getAttribute("code") || "",
       played: game.getAttribute("played") === "true",
       cetdate: game.getAttribute("cetdate") || "",
+      time: game.getAttribute("time") || "",
+      round: roundText,
+      gameday: parseInt(game.getAttribute("gameday") || "0"),
+      group: game.getAttribute("group") || "",
       stadium: game.getAttribute("stadium") || "",
       stadiumname: game.getAttribute("stadiumname") || "",
       audience: parseInt(game.getElementsByTagName("audience")[0]?.textContent || "0"),

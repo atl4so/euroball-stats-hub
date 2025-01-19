@@ -8,7 +8,6 @@ import { GameStatus } from "@/components/game/GameStatus";
 import { QuarterScores } from "@/components/game/QuarterScores";
 import { TeamStats } from "@/components/game/TeamStats";
 import { useEffect } from "react";
-import { PageBreadcrumb } from "@/components/PageBreadcrumb";
 
 const GameDetails = () => {
   const { gameCode } = useParams();
@@ -33,65 +32,56 @@ const GameDetails = () => {
   if (error) return <div className="p-4">Error loading game details: {error.message}</div>;
   if (!gameDetails) return <div className="p-4">No game details found</div>;
 
-  const breadcrumbItems = [
-    { label: "Games", path: "/" },
-    { label: `${gameDetails.localclub.name} vs ${gameDetails.roadclub.name}`, path: `/game/${gameCode}` },
-  ];
-
   return (
-    <div>
-      <PageBreadcrumb items={breadcrumbItems} />
-      
-      <div className="container mx-auto px-3 sm:px-4 py-4 sm:py-6 space-y-4 sm:space-y-6 max-w-7xl">
-        <GameHeader
-          localTeam={gameDetails.localclub.name}
-          roadTeam={gameDetails.roadclub.name}
-          date={gameDetails.cetdate}
+    <div className="container mx-auto px-3 sm:px-4 py-4 sm:py-6 space-y-4 sm:space-y-6 max-w-7xl">
+      <GameHeader
+        localTeam={gameDetails.localclub.name}
+        roadTeam={gameDetails.roadclub.name}
+        date={gameDetails.cetdate}
+      />
+
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
+        <GameScore
+          game={{
+            gamecode: gameCode || "",
+            gamenumber: parseInt(gameCode || "0", 10),
+            gameday: gameDetails.gameday,
+            round: gameDetails.round,
+            group: gameDetails.group,
+            date: gameDetails.cetdate,
+            time: gameDetails.time,
+            hometeam: gameDetails.localclub.name,
+            homecode: gameDetails.localclub.code,
+            awayteam: gameDetails.roadclub.name,
+            awaycode: gameDetails.roadclub.code,
+            homescore: gameDetails.localclub.score.toString(),
+            awayscore: gameDetails.roadclub.score.toString(),
+            live: "0",
+            score: gameDetails.localclub.score > 0 ? "1" : "",
+            played: gameDetails.played,
+          }}
         />
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
-          <GameScore
-            game={{
-              gamecode: gameCode || "",
-              gamenumber: parseInt(gameCode || "0", 10),
-              gameday: parseInt(gameDetails.round, 10),
-              round: gameDetails.round,
-              group: "Regular Season",
-              date: gameDetails.cetdate,
-              time: gameDetails.time,
-              hometeam: gameDetails.localclub.name,
-              homecode: gameDetails.localclub.code,
-              awayteam: gameDetails.roadclub.name,
-              awaycode: gameDetails.roadclub.code,
-              homescore: gameDetails.localclub.score.toString(),
-              awayscore: gameDetails.roadclub.score.toString(),
-              live: "0",
-              score: gameDetails.localclub.score > 0 ? "1" : "",
-              played: gameDetails.played,
-            }}
-          />
-          <GameLocation
-            stadiumname={gameDetails.stadiumname}
-            attendance={gameDetails.audience.toString()}
-          />
-          <GameStatus
-            played={gameDetails.localclub.score > 0}
-            date={gameDetails.cetdate}
-            time={gameDetails.time}
-          />
-        </div>
+        <GameLocation
+          stadiumname={gameDetails.stadiumname}
+          attendance={gameDetails.audience.toString()}
+        />
 
-        <div className="grid grid-cols-1 gap-3 sm:gap-4">
-          <QuarterScores
-            localTeam={gameDetails.localclub}
-            roadTeam={gameDetails.roadclub}
-          />
+        <GameStatus
+          played={gameDetails.played}
+          date={gameDetails.cetdate}
+          time={gameDetails.time}
+        />
+      </div>
 
-          <div className="space-y-4 sm:space-y-6">
-            <TeamStats team={gameDetails.localclub} />
-            <TeamStats team={gameDetails.roadclub} />
-          </div>
-        </div>
+      <QuarterScores
+        localTeam={gameDetails.localclub}
+        roadTeam={gameDetails.roadclub}
+      />
+
+      <div className="space-y-6">
+        <TeamStats team={gameDetails.localclub} />
+        <TeamStats team={gameDetails.roadclub} />
       </div>
     </div>
   );
