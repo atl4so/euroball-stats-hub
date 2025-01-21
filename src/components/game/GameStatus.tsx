@@ -1,5 +1,5 @@
 import { Card, CardContent } from "@/components/ui/card";
-import { format } from "date-fns";
+import { format, isValid, parseISO } from "date-fns";
 import { Calendar, Clock } from "lucide-react";
 
 interface GameStatusProps {
@@ -9,6 +9,19 @@ interface GameStatusProps {
 }
 
 export const GameStatus = ({ played, date, time }: GameStatusProps) => {
+  const formatDate = (dateString: string) => {
+    try {
+      const parsedDate = parseISO(dateString);
+      if (!isValid(parsedDate)) {
+        return "Date TBD";
+      }
+      return format(parsedDate, "MMMM d, yyyy");
+    } catch (error) {
+      console.error("Error formatting date:", error);
+      return "Date TBD";
+    }
+  };
+
   return (
     <Card className="bg-gradient-to-br from-green-50 to-emerald-50 dark:from-green-950 dark:to-emerald-950 border-0 shadow-lg">
       <CardContent className="p-4 sm:p-6">
@@ -17,7 +30,7 @@ export const GameStatus = ({ played, date, time }: GameStatusProps) => {
             <Calendar className="h-4 w-4 mt-0.5 text-green-500 dark:text-green-400 flex-shrink-0" />
             <div>
               <div className="text-sm sm:text-base font-medium text-gray-900 dark:text-gray-100">
-                {format(new Date(date), "MMMM d, yyyy")}
+                {formatDate(date)}
               </div>
               <div className="text-xs sm:text-sm text-gray-500 dark:text-gray-400">
                 Date

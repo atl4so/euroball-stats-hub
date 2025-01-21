@@ -296,27 +296,7 @@ export const fetchTeams = async (seasonCode: string): Promise<TeamsResponse> => 
         versus: game.getAttribute("versus") || "",
       })) : [];
 
-      const rosterElement = club.getElementsByTagName("roster")[0];
-      console.log("Roster element:", rosterElement);
-      
-      const playerElements = rosterElement?.getElementsByTagName("player") || [];
-      console.log("Player elements:", playerElements.length);
-      
-      const players = Array.from(playerElements).map(player => {
-        console.log("Raw player element:", player.outerHTML);
-        return {
-          code: player.getAttribute("code") || "",
-          name: player.getAttribute("name") || "",
-          alias: player.getAttribute("alias") || "",
-          dorsal: player.getAttribute("dorsal") || "",
-          position: player.getAttribute("position") || "",
-          countrycode: player.getAttribute("countrycode") || "",
-          countryname: player.getAttribute("countryname") || "",
-        };
-      });
-      console.log("Parsed players:", players);
-
-      const clubData = {
+      return {
         code: club.getAttribute("code") || "",
         tvcode: club.getAttribute("tvcode") || "",
         name: club.getElementsByTagName("name")[0]?.textContent || "",
@@ -340,7 +320,15 @@ export const fetchTeams = async (seasonCode: string): Promise<TeamsResponse> => 
           }
         },
         roster: {
-          player: players
+          player: Array.from(club.getElementsByTagName("player")).map(player => ({
+            code: player.getAttribute("code") || "",
+            name: player.getAttribute("name") || "",
+            alias: player.getAttribute("alias") || "",
+            dorsal: player.getAttribute("dorsal") || "",
+            position: player.getAttribute("position") || "",
+            countrycode: player.getAttribute("countrycode") || "",
+            countryname: player.getAttribute("countryname") || "",
+          }))
         },
         coach: {
           code: club.getElementsByTagName("coach")[0]?.getAttribute("code") || "",
@@ -350,17 +338,13 @@ export const fetchTeams = async (seasonCode: string): Promise<TeamsResponse> => 
           countryname: club.getElementsByTagName("coach")[0]?.getAttribute("countryname") || "",
         }
       };
-      console.log("Parsed club data:", clubData);
-      return clubData;
     });
 
-    const result = {
+    return {
       clubs: {
         club: clubs
       }
     };
-    console.log("Final result:", result);
-    return result;
   } catch (error) {
     console.error("Error in fetchTeams:", error);
     throw error;
