@@ -497,7 +497,13 @@ export const fetchClubV3 = async (clubCode: string): Promise<ClubV3Response> => 
   const response = await fetch(
     `${BASE_URL_V3}/clubs/${clubCode}`,
     {
-      headers: API_HEADERS,
+      headers: {
+        ...API_HEADERS,
+        "Accept": "application/json",
+        "Content-Type": "application/json",
+        "Origin": "https://www.euroleague.net",
+        "Referer": "https://www.euroleague.net/",
+      },
     }
   );
 

@@ -1,9 +1,9 @@
 import { useParams } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
+import { useEffect } from "react";
 import { fetchTeams, fetchClubV3 } from "@/services/euroleagueApi";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { format, parseISO } from "date-fns";
 import { GameCard } from "@/components/game/GameCard";
 
 const TeamDetails = () => {
