@@ -41,10 +41,10 @@ export const fetchResults = async (seasonCode: string, gameNumber: number): Prom
       group: game.getElementsByTagName("group")[0]?.textContent || "",
       hometeam: game.getElementsByTagName("hometeam")[0]?.textContent || "",
       homecode: game.getElementsByTagName("homecode")[0]?.textContent || "",
-      homescore: parseInt(game.getElementsByTagName("homescore")[0]?.textContent || "0"),
+      homescore: game.getElementsByTagName("homescore")[0]?.textContent || "0",
       awayteam: game.getElementsByTagName("awayteam")[0]?.textContent || "",
       awaycode: game.getElementsByTagName("awaycode")[0]?.textContent || "",
-      awayscore: parseInt(game.getElementsByTagName("awayscore")[0]?.textContent || "0"),
+      awayscore: game.getElementsByTagName("awayscore")[0]?.textContent || "0",
       played: game.getElementsByTagName("played")[0]?.textContent === "true"
     }));
 

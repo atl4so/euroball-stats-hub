@@ -42,10 +42,11 @@ export const GameCard = ({ game }: GameCardProps) => {
       `}>
         <CardContent className="p-4 space-y-4">
           <div className="flex items-center justify-between mb-2">
-            <GameStatus status={game.status} time={game.time || getGameTime()} />
-            <div className="text-sm text-gray-500 dark:text-gray-400">
-              {getGameDate()}
-            </div>
+            <GameStatus 
+              played={isCompleted}
+              date={getGameDate()}
+              time={getGameTime()}
+            />
           </div>
 
           <div className="grid grid-cols-3 gap-2 items-center">
@@ -70,9 +71,8 @@ export const GameCard = ({ game }: GameCardProps) => {
 
           <div className="mt-2">
             <GameLocation
-              stadium={game.stadium}
-              stadiumname={game.stadiumname}
-              attendance={game.attendance}
+              stadiumname={game.stadiumname || ""}
+              attendance={game.attendance || ""}
             />
           </div>
         </CardContent>

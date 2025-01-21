@@ -16,7 +16,7 @@ export const TeamCard = ({ team, v3Details }: TeamCardProps) => {
           <div className="flex items-center gap-4 h-full">
             <div className="flex-shrink-0 w-16">
               <img
-                src={v3Details?.images?.crest || team.images?.logo}
+                src={v3Details?.images?.crest}
                 alt={team.name}
                 className="w-16 h-16 object-contain"
               />
@@ -24,7 +24,7 @@ export const TeamCard = ({ team, v3Details }: TeamCardProps) => {
             <div className="flex-1 min-w-0">
               <h3 className="font-bold text-lg truncate">{team.name}</h3>
               <p className="text-sm text-gray-500 dark:text-gray-400 truncate">
-                {v3Details?.city || team.city}, {v3Details?.country?.name || team.country}
+                {v3Details?.city}, {v3Details?.country?.name}
               </p>
               {v3Details?.venue && (
                 <p className="text-sm text-gray-500 dark:text-gray-400 truncate">
