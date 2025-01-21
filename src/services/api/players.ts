@@ -1,12 +1,12 @@
 import { PlayerDetails } from "@/types/euroleague";
-import { BASE_URL, defaultHeaders } from "./config";
+import { BASE_URL, API_HEADERS } from "./config";
 
 export const fetchPlayerDetails = async (playerCode: string, seasonCode: string): Promise<PlayerDetails> => {
   try {
     const response = await fetch(
       `${BASE_URL}/players?playerCode=${playerCode}&seasonCode=${seasonCode}`,
       {
-        headers: defaultHeaders,
+        headers: API_HEADERS,
       }
     );
     

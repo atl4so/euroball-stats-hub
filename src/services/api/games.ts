@@ -1,12 +1,12 @@
 import { ResultsResponse, ScheduleResponse, GameDetails } from "@/types/euroleague";
-import { BASE_URL, defaultHeaders } from "./config";
+import { BASE_URL, API_HEADERS } from "./config";
 
 export const fetchResults = async (seasonCode: string, gameNumber: number): Promise<ResultsResponse> => {
   try {
     const response = await fetch(
       `${BASE_URL}/results?seasonCode=${seasonCode}&gameNumber=${gameNumber}`,
       {
-        headers: defaultHeaders,
+        headers: API_HEADERS,
       }
     );
     
@@ -47,7 +47,7 @@ export const fetchSchedule = async (seasonCode: string, gameNumber: number): Pro
     const response = await fetch(
       `${BASE_URL}/schedules?seasonCode=${seasonCode}&gameNumber=${gameNumber}`,
       {
-        headers: defaultHeaders,
+        headers: API_HEADERS,
       }
     );
     
@@ -94,7 +94,7 @@ export const fetchGameDetails = async (gameCode: number, seasonCode: string): Pr
     const response = await fetch(
       `${BASE_URL}/games?seasonCode=${seasonCode}&gameCode=${gameCode}`,
       {
-        headers: defaultHeaders,
+        headers: API_HEADERS,
       }
     );
     
