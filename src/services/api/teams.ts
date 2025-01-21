@@ -8,12 +8,7 @@ export const fetchTeams = async (seasonCode: string): Promise<TeamsResponse> => 
       `${BASE_URL}/teams?seasonCode=${seasonCode}`,
       {
         method: "GET",
-        headers: {
-          "Accept": "application/xml",
-          "Content-Type": "application/xml",
-          "Origin": "https://www.euroleague.net",
-          "Referer": "https://www.euroleague.net/",
-        },
+        headers: API_HEADERS,
       }
     );
     

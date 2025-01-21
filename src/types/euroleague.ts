@@ -187,5 +187,8 @@ export interface ClubV3Response {
   };
   venue?: {
     name?: string;
+    capacity?: number;
   };
+  instagramAccount?: string;
+  facebookAccount?: string;
 }
