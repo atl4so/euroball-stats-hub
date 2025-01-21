@@ -73,30 +73,32 @@ const Index = () => {
                 <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-100">Games Center</h2>
                 <p className="text-sm text-gray-500 dark:text-gray-400">View all games and results</p>
               </div>
-              {user ? (
-                <DropdownMenu>
-                  <DropdownMenuTrigger asChild>
-                    <Button variant="outline" size="icon" className="border-gray-200 dark:border-gray-800">
-                      <User className="h-4 w-4 text-gray-600 dark:text-gray-400" />
-                    </Button>
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent align="end" className="w-56">
-                    <DropdownMenuItem disabled className="text-sm text-gray-500 dark:text-gray-400">
-                      <User className="mr-2 h-4 w-4" />
-                      <span>{user.email}</span>
-                    </DropdownMenuItem>
-                    <DropdownMenuSeparator />
-                    <DropdownMenuItem onClick={() => supabase.auth.signOut()} className="text-red-600 dark:text-red-400">
-                      <LogOut className="mr-2 h-4 w-4" />
-                      <span>Log out</span>
-                    </DropdownMenuItem>
-                  </DropdownMenuContent>
-                </DropdownMenu>
-              ) : (
-                <Button asChild variant="outline" className="border-gray-200 dark:border-gray-800">
-                  <Link to="/auth">Sign In</Link>
-                </Button>
-              )}
+              <div className="hidden">
+                {user ? (
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <Button variant="outline" size="icon" className="border-gray-200 dark:border-gray-800">
+                        <User className="h-4 w-4 text-gray-600 dark:text-gray-400" />
+                      </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="end" className="w-56">
+                      <DropdownMenuItem disabled className="text-sm text-gray-500 dark:text-gray-400">
+                        <User className="mr-2 h-4 w-4" />
+                        <span>{user.email}</span>
+                      </DropdownMenuItem>
+                      <DropdownMenuSeparator />
+                      <DropdownMenuItem onClick={() => supabase.auth.signOut()} className="text-red-600 dark:text-red-400">
+                        <LogOut className="mr-2 h-4 w-4" />
+                        <span>Log out</span>
+                      </DropdownMenuItem>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
+                ) : (
+                  <Button asChild variant="outline" className="border-gray-200 dark:border-gray-800">
+                    <Link to="/auth">Sign In</Link>
+                  </Button>
+                )}
+              </div>
             </div>
 
             <Tabs defaultValue="results" className="w-full space-y-6">

@@ -1,13 +1,5 @@
 import React from "react";
-import { Link, useLocation } from "react-router-dom";
-import {
-  Breadcrumb,
-  BreadcrumbItem,
-  BreadcrumbLink,
-  BreadcrumbList,
-  BreadcrumbPage,
-  BreadcrumbSeparator,
-} from "@/components/ui/breadcrumb";
+import { Link } from "react-router-dom";
 
 interface BreadcrumbItem {
   label: string;
@@ -18,34 +10,23 @@ interface PageBreadcrumbProps {
   items: BreadcrumbItem[];
 }
 
-export function PageBreadcrumb({ items }: PageBreadcrumbProps) {
+export const PageBreadcrumb = ({ items }: PageBreadcrumbProps) => {
   return (
-    <Breadcrumb className="py-4 px-6 bg-background border-b">
-      <BreadcrumbList>
-        <BreadcrumbItem>
-          <BreadcrumbLink asChild>
-            <Link to="/">Home</Link>
-          </BreadcrumbLink>
-        </BreadcrumbItem>
-        <BreadcrumbSeparator />
-        {items.map((item, index) => {
-          const isLast = index === items.length - 1;
-          return (
-            <React.Fragment key={item.path}>
-              <BreadcrumbItem>
-                {isLast ? (
-                  <BreadcrumbPage>{item.label}</BreadcrumbPage>
-                ) : (
-                  <BreadcrumbLink asChild>
-                    <Link to={item.path}>{item.label}</Link>
-                  </BreadcrumbLink>
-                )}
-              </BreadcrumbItem>
-              {!isLast && <BreadcrumbSeparator />}
-            </React.Fragment>
-          );
-        })}
-      </BreadcrumbList>
-    </Breadcrumb>
+    <nav className="flex px-4 py-2 text-sm text-gray-600 dark:text-gray-400">
+      <Link to="/" className="hover:text-primary">Home</Link>
+      {items.map((item, index) => (
+        <div key={item.path} className="flex items-center">
+          <span className="mx-2">{">"}</span>
+          <Link
+            to={item.path}
+            className={`hover:text-primary ${
+              index === items.length - 1 ? "text-primary font-medium" : ""
+            }`}
+          >
+            {item.label}
+          </Link>
+        </div>
+      ))}
+    </nav>
   );
-}
+};

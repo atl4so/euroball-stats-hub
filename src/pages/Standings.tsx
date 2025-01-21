@@ -1,5 +1,5 @@
-import { useQuery } from "@tanstack/react-query";
-import { fetchStandings, fetchTeams } from "@/services/euroleagueApi";
+import { useQuery, useQueries } from "@tanstack/react-query";
+import { fetchBasicStandings, fetchStandings, fetchTeams, fetchClubV3 } from "@/services/euroleagueApi";
 import {
   Table,
   TableBody,
@@ -8,12 +8,13 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { Card } from "@/components/ui/card";
-import { useEffect } from "react";
-import { Link } from "react-router-dom";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { PageBreadcrumb } from "@/components/PageBreadcrumb";
-import { LastGamesIndicator } from "@/components/LastGamesIndicator";
+import { Skeleton } from "@/components/ui/skeleton";
+import { Link } from "react-router-dom";
 import { Team } from "@/types/team";
+import { useEffect } from "react";
+import { LastGamesIndicator } from "@/components/LastGamesIndicator";
 
 const getPositionStyle = (ranking: number) => {
   if (ranking <= 6) return "bg-blue-100 dark:bg-blue-900/50";
@@ -28,7 +29,7 @@ const getLastFiveGames = (team: Team) => {
     .filter(game => game.played)
     .sort((a, b) => new Date(b.gamedate).getTime() - new Date(a.gamedate).getTime())
     .slice(0, 5)
-    .reverse() // Reverse the array so most recent game is last (will appear on the right)
+    .reverse()
     .map(game => game.win === "1" ? "W" : "L") as ("W" | "L")[];
 };
 
@@ -43,6 +44,26 @@ const Standings = () => {
     queryFn: () => fetchTeams("E2024"),
   });
 
+  const { data: extraStats } = useQuery({
+    queryKey: ["basicStandings"],
+    queryFn: () => fetchBasicStandings(),
+  });
+
+  const clubQueries = useQueries({
+    queries: (standings?.standings.group.team || []).map((team) => ({
+      queryKey: ["club", team.code],
+      queryFn: () => fetchClubV3(team.code),
+      staleTime: Infinity,
+    })),
+  });
+
+  const getClubLogo = (code: string) => {
+    const clubData = clubQueries.find(
+      (q) => q.data?.code === code
+    )?.data;
+    return clubData?.images?.crest;
+  };
+
   useEffect(() => {
     document.title = "Standings - Euroball Stats Hub";
   }, []);
@@ -51,7 +72,22 @@ const Standings = () => {
     { label: "Standings", path: "/standings" },
   ];
 
-  if (standingsLoading || teamsLoading) return <div className="p-4">Loading...</div>;
+  if (standingsLoading || teamsLoading || clubQueries.some((q) => q.isLoading)) {
+    return (
+      <div className="container mx-auto py-6">
+        <PageBreadcrumb items={breadcrumbItems} />
+        <Card>
+          <CardHeader>
+            <CardTitle>Standings</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <Skeleton className="h-[400px] w-full" />
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
+
   if (standingsError) return <div className="p-4">Error loading standings</div>;
   if (!standings || !teamsData) return <div className="p-4">No standings data available</div>;
 
@@ -88,6 +124,9 @@ const Standings = () => {
                     (t) => t.code.toLowerCase() === team.code.toLowerCase()
                   );
                   const lastGames = teamDetails ? getLastFiveGames(teamDetails) : [];
+                  const extraTeamStats = extraStats?.teams.find(
+                    (t) => t.club.code === team.code
+                  );
 
                   return (
                     <TableRow
@@ -98,13 +137,26 @@ const Standings = () => {
                       `}
                     >
                       <TableCell className="font-medium">
-                        {team.ranking}
+                        <div className="flex items-center gap-1">
+                          {team.ranking}
+                          {extraTeamStats?.positionChange === "Up" && (
+                            <span className="text-green-500 text-lg">↑</span>
+                          )}
+                          {extraTeamStats?.positionChange === "Down" && (
+                            <span className="text-red-500 text-lg">↓</span>
+                          )}
+                        </div>
                       </TableCell>
                       <TableCell>
                         <Link 
                           to={`/team/${team.code.toLowerCase()}`}
-                          className="flex items-center hover:text-primary transition-colors"
+                          className="flex items-center gap-2 hover:text-primary transition-colors"
                         >
+                          <img
+                            src={getClubLogo(team.code)}
+                            alt={team.name}
+                            className="h-6 w-6"
+                          />
                           <span className="font-medium">{team.name}</span>
                         </Link>
                       </TableCell>
@@ -116,10 +168,10 @@ const Standings = () => {
                         {team.losses}
                       </TableCell>
                       <TableCell className="text-center hidden md:table-cell">
-                        {team.ptsfavour}
+                        {Number(extraTeamStats?.pointsFor || team.ptsfavour).toLocaleString()}
                       </TableCell>
                       <TableCell className="text-center hidden md:table-cell">
-                        {team.ptsagainst}
+                        {Number(extraTeamStats?.pointsAgainst || team.ptsagainst).toLocaleString()}
                       </TableCell>
                       <TableCell
                         className={`text-center font-medium ${
@@ -130,13 +182,21 @@ const Standings = () => {
                             : "text-muted-foreground"
                         }`}
                       >
-                        {team.difference > 0 ? "+" : ""}
-                        {team.difference}
+                        {extraTeamStats?.pointsDifference || (team.difference > 0 ? "+" : "") + team.difference}
                       </TableCell>
                       <TableCell>
                         <div className="flex gap-1 justify-center">
                           {lastGames.map((result, index) => (
-                            <LastGamesIndicator key={index} result={result} />
+                            <div
+                              key={index}
+                              className={`w-4 h-4 rounded-full flex items-center justify-center text-[10px] font-bold text-white ${
+                                result === "W"
+                                  ? "bg-green-500"
+                                  : "bg-red-500"
+                              }`}
+                            >
+                              {result}
+                            </div>
                           ))}
                         </div>
                       </TableCell>

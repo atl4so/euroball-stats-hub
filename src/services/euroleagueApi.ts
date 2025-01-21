@@ -1,14 +1,20 @@
 import { ResultsResponse, ScheduleResponse, PlayerDetails, GameDetails, TeamStats } from "@/types/euroleague";
 import { xmlToJson } from "@/utils/xmlParser";
 import { TeamsResponse } from "@/types/team";
+import { type BasicStandingsResponse } from "@/types/basicStandings";
 
 const BASE_URL = "https://api-live.euroleague.net/v1";
+const BASE_URL_V3 = "https://api-live.euroleague.net/v3";
 
 const defaultHeaders = {
   "Accept": "application/json",
   "Content-Type": "application/json",
   "Origin": "https://www.euroleague.net",
   "Referer": "https://www.euroleague.net/",
+};
+
+const API_HEADERS = {
+  ...defaultHeaders,
 };
 
 export const fetchResults = async (seasonCode: string, gameNumber: number): Promise<ResultsResponse> => {
@@ -361,6 +367,21 @@ export const fetchTeams = async (seasonCode: string): Promise<TeamsResponse> => 
   }
 };
 
+export const fetchBasicStandings = async (roundNumber: string = "22"): Promise<BasicStandingsResponse> => {
+  const response = await fetch(
+    `${BASE_URL_V3}/competitions/euroleague/seasons/e2024/rounds/${roundNumber}/basicstandings`,
+    {
+      headers: API_HEADERS,
+    }
+  );
+
+  if (!response.ok) {
+    throw new Error(`Failed to fetch basic standings: ${response.statusText}`);
+  }
+
+  return response.json();
+};
+
 export interface StandingsTeam {
   name: string;
   code: string;
@@ -437,4 +458,52 @@ export const fetchStandings = async (seasonCode: string = "E2024", gameNumber: n
       },
     },
   } as StandingsResponse;
+};
+
+export interface ClubV3Response {
+  code: string;
+  name: string;
+  alias: string;
+  isVirtual: boolean;
+  country: {
+    code: string;
+    name: string;
+  };
+  address: string;
+  website: string;
+  ticketsUrl: string;
+  twitterAccount: string;
+  instagramAccount: string;
+  facebookAccount: string;
+  venue: {
+    name: string;
+    code: string;
+    capacity: number;
+    address: string;
+    images: Record<string, string>;
+    active: boolean;
+    notes: string;
+  };
+  city: string;
+  president: string;
+  phone: string;
+  fax: string;
+  images: {
+    crest: string;
+  };
+}
+
+export const fetchClubV3 = async (clubCode: string): Promise<ClubV3Response> => {
+  const response = await fetch(
+    `${BASE_URL_V3}/clubs/${clubCode}`,
+    {
+      headers: API_HEADERS,
+    }
+  );
+
+  if (!response.ok) {
+    throw new Error(`Failed to fetch club details: ${response.statusText}`);
+  }
+
+  return response.json();
 };
