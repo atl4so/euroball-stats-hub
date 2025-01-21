@@ -1,7 +1,7 @@
 import { Link } from "react-router-dom";
 import { Card, CardContent } from "@/components/ui/card";
 import { Team } from "@/types/team";
-import { ClubV3Response } from "@/services/euroleagueApi";
+import { ClubV3Response } from "@/types/euroleague";
 
 interface TeamCardProps {
   team: Team;
