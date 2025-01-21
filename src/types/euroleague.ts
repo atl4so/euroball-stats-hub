@@ -174,21 +174,3 @@ export interface GameDetails {
   localclub: TeamStats;
   roadclub: TeamStats;
 }
-
-export interface ClubV3Response {
-  code: string;
-  name: string;
-  images?: {
-    crest?: string;
-  };
-  city?: string;
-  country?: {
-    name?: string;
-  };
-  venue?: {
-    name?: string;
-    capacity?: number;
-  };
-  instagramAccount?: string;
-  facebookAccount?: string;
-}
