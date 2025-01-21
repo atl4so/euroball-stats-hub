@@ -14,4 +14,12 @@ export interface Game {
   stadium?: string;
   stadiumname?: string;
   attendance?: string;
+  round?: string;
+  gameday?: number;
+  date?: string;
+  gamenumber?: number;
+  group?: string;
+  homecode?: string;
+  awaycode?: string;
+  played?: boolean;
 }

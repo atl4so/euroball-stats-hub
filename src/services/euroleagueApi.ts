@@ -102,7 +102,10 @@ export const fetchSchedule = async (seasonCode: string, gameNumber: number): Pro
 export const fetchGameDetails = async (gameCode: number, seasonCode: string): Promise<GameDetails> => {
   try {
     const response = await fetch(
-      `${BASE_URL}/games?seasonCode=${seasonCode}&gameCode=${gameCode}`
+      `${BASE_URL}/games?seasonCode=${seasonCode}&gameCode=${gameCode}`,
+      {
+        headers: defaultHeaders,
+      }
     );
     
     if (!response.ok) {
@@ -114,13 +117,10 @@ export const fetchGameDetails = async (gameCode: number, seasonCode: string): Pr
     const xmlDoc = parser.parseFromString(data, "text/xml");
     
     const game = xmlDoc.getElementsByTagName("game")[0];
-    console.log("Game XML attributes:", {
-      round: game.getAttribute("round"),
-      roundElement: game.getElementsByTagName("round")[0]?.textContent,
-      gameday: game.getAttribute("gameday"),
-      group: game.getAttribute("group")
-    });
-    
+    if (!game) {
+      throw new Error("Game data not found");
+    }
+
     const roundText = game.getElementsByTagName("round")[0]?.textContent || game.getAttribute("round") || "";
 
     const parseTeamStats = (teamElement: Element): TeamStats => {

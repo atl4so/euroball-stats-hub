@@ -1,195 +1,196 @@
+import { useParams } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
-import { useParams, Link } from "react-router-dom";
-import { fetchTeams } from "@/services/euroleagueApi";
-import { Loader2, MapPin, Users, Trophy } from "lucide-react";
-import { Card, CardContent, CardHeader } from "@/components/ui/card";
+import { fetchTeams, fetchClubV3 } from "@/services/euroleagueApi";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { TeamsResponse, Team } from "@/types/team";
-import { PageBreadcrumb } from "@/components/PageBreadcrumb";
+import { format, parseISO } from "date-fns";
+import { GameCard } from "@/components/game/GameCard";
 
 const TeamDetails = () => {
   const { teamCode } = useParams();
-  console.log("Current teamCode:", teamCode);
 
-  const { data: teamsData, isLoading, error } = useQuery<TeamsResponse, Error>({
+  const { data: teamsData, isLoading: isLoadingTeams } = useQuery({
     queryKey: ["teams"],
-    queryFn: () => fetchTeams("E2024")
+    queryFn: () => fetchTeams("E2024"),
   });
 
-  console.log("Teams data:", teamsData);
-  console.log("Loading:", isLoading);
-  console.log("Error:", error);
+  const { data: clubV3Data, isLoading: isLoadingClubV3 } = useQuery({
+    queryKey: ["clubV3", teamCode],
+    queryFn: () => fetchClubV3(teamCode || ""),
+    enabled: !!teamCode,
+  });
 
-  if (isLoading) {
-    return (
-      <div className="min-h-screen bg-background flex items-center justify-center">
-        <Loader2 className="h-8 w-8 animate-spin" />
-      </div>
-    );
+  const teamData = teamsData?.clubs.club.find(club => club.code === teamCode);
+
+  useEffect(() => {
+    if (teamData) {
+      document.title = `${teamData.name} - Team Details`;
+    }
+  }, [teamData]);
+
+  if (isLoadingTeams || isLoadingClubV3) {
+    return <div className="p-4">Loading...</div>;
   }
 
-  const team = teamsData?.clubs?.club?.find(
-    (t) => t.code.toLowerCase() === teamCode?.toLowerCase()
-  );
-  
-  console.log("Found team:", team);
-
-  if (!team) {
-    return (
-      <div className="min-h-screen bg-background flex items-center justify-center">
-        <div className="text-center">
-          <h2 className="text-xl font-semibold">Team not found</h2>
-        </div>
-      </div>
-    );
+  if (!teamData) {
+    return <div className="p-4">Team not found</div>;
   }
 
-  const breadcrumbItems = [
-    { label: "Teams", path: "/teams" },
-    { label: team.name, path: `/team/${teamCode}` },
-  ];
+  const getGamePhase = (game: any) => {
+    return game.phasetypecode || "Regular Season";
+  };
 
   return (
-    <div className="min-h-screen bg-background">
-      <PageBreadcrumb items={breadcrumbItems} />
-      
-      <div className="container mx-auto px-3 sm:px-4 py-4 sm:py-6 space-y-4 sm:space-y-6 max-w-7xl">
-        <div className="mb-6">
-          <h1 className="text-3xl font-bold text-gray-900 dark:text-gray-100">{team.name}</h1>
-          <p className="text-gray-500 dark:text-gray-400 flex items-center gap-2 mt-2">
-            <MapPin className="h-4 w-4" />
-            {team.countryname}
-          </p>
-        </div>
+    <div className="container mx-auto px-4 py-6 space-y-6 max-w-7xl">
+      <Card className="bg-gradient-to-br from-blue-50 to-indigo-50 dark:from-blue-950 dark:to-indigo-950">
+        <CardHeader>
+          <div className="flex items-center gap-6">
+            {clubV3Data?.images?.crest && (
+              <img
+                src={clubV3Data.images.crest}
+                alt={teamData.name}
+                className="w-24 h-24 object-contain"
+              />
+            )}
+            <div>
+              <CardTitle className="text-2xl font-bold">{teamData.name}</CardTitle>
+              <div className="text-sm text-gray-500 dark:text-gray-400 mt-1">
+                {clubV3Data?.city}, {clubV3Data?.country?.name}
+              </div>
+            </div>
+          </div>
+        </CardHeader>
+        <CardContent>
+          <Tabs defaultValue="info" className="space-y-4">
+            <TabsList>
+              <TabsTrigger value="info">Team Info</TabsTrigger>
+              <TabsTrigger value="games">Games</TabsTrigger>
+              <TabsTrigger value="roster">Roster</TabsTrigger>
+            </TabsList>
 
-        <Tabs defaultValue="info" className="space-y-4">
-          <TabsList className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700">
-            <TabsTrigger value="info">Info</TabsTrigger>
-            <TabsTrigger value="roster">Roster</TabsTrigger>
-            <TabsTrigger value="games">Games</TabsTrigger>
-          </TabsList>
-
-          <TabsContent value="info" className="space-y-4">
-            <Card className="bg-gradient-to-br from-blue-50 to-indigo-50 dark:from-blue-950 dark:to-indigo-950 border-0 shadow-lg">
-              <CardHeader className="text-lg font-semibold text-gray-900 dark:text-gray-100">Club Details</CardHeader>
-              <CardContent className="space-y-4">
+            <TabsContent value="info" className="space-y-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                  <h3 className="font-medium text-gray-900 dark:text-gray-100">Arena</h3>
-                  <p className="text-gray-500 dark:text-gray-400">{team.arena.name}</p>
+                  <h3 className="font-semibold mb-2">Venue</h3>
+                  <p className="text-sm text-gray-600 dark:text-gray-300">
+                    {clubV3Data?.venue?.name}
+                    {clubV3Data?.venue?.capacity && (
+                      <span className="block text-sm text-gray-500 dark:text-gray-400">
+                        Capacity: {clubV3Data.venue.capacity.toLocaleString()}
+                      </span>
+                    )}
+                  </p>
                 </div>
-                {team.website && (
-                  <div>
-                    <h3 className="font-medium text-gray-900 dark:text-gray-100">Website</h3>
+
+                <div>
+                  <h3 className="font-semibold mb-2">Contact</h3>
+                  {teamData.website && (
                     <a
-                      href={team.website}
+                      href={teamData.website}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="text-blue-600 dark:text-blue-400 hover:underline"
+                      className="text-sm text-blue-600 dark:text-blue-400 hover:underline block"
                     >
-                      {team.website}
+                      Official Website
                     </a>
-                  </div>
-                )}
-                {team.ticketsurl && (
-                  <div>
-                    <h3 className="font-medium text-gray-900 dark:text-gray-100">Tickets</h3>
+                  )}
+                  {teamData.ticketsurl && (
                     <a
-                      href={team.ticketsurl}
+                      href={teamData.ticketsurl}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="text-blue-600 dark:text-blue-400 hover:underline"
+                      className="text-sm text-blue-600 dark:text-blue-400 hover:underline block mt-1"
                     >
                       Buy Tickets
                     </a>
-                  </div>
-                )}
-              </CardContent>
-            </Card>
-          </TabsContent>
-
-          <TabsContent value="roster" className="space-y-4">
-            <Card className="bg-gradient-to-br from-blue-50 to-indigo-50 dark:from-blue-950 dark:to-indigo-950 border-0 shadow-lg">
-              <CardContent className="pt-6">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  {team.roster?.player?.map((player) => (
-                    <div
-                      key={player.code}
-                      className="flex items-center gap-4 p-4 rounded-lg bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors"
-                    >
-                      <div className="flex-1">
-                        <Link 
-                          to={`/player/${player.code}`}
-                          className="font-medium text-gray-900 dark:text-gray-100 hover:text-blue-600 dark:hover:text-blue-400"
-                        >
-                          {player.name}
-                        </Link>
-                        <p className="text-sm text-gray-500 dark:text-gray-400">
-                          {player.position} • #{player.dorsal}
-                        </p>
-                      </div>
-                    </div>
-                  ))}
+                  )}
                 </div>
-              </CardContent>
-            </Card>
+              </div>
 
-            {team.coach && (
-              <Card className="bg-gradient-to-br from-blue-50 to-indigo-50 dark:from-blue-950 dark:to-indigo-950 border-0 shadow-lg">
-                <CardHeader className="text-lg font-semibold text-gray-900 dark:text-gray-100">Head Coach</CardHeader>
-                <CardContent>
-                  <div className="flex items-center gap-4">
-                    <div>
-                      <p className="font-medium text-gray-900 dark:text-gray-100">{team.coach.name}</p>
-                      <p className="text-sm text-gray-500 dark:text-gray-400">
-                        {team.coach.countryname}
-                      </p>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-            )}
-          </TabsContent>
-
-          <TabsContent value="games" className="space-y-4">
-            <Card className="bg-gradient-to-br from-blue-50 to-indigo-50 dark:from-blue-950 dark:to-indigo-950 border-0 shadow-lg">
-              <CardContent className="pt-6">
-                <div className="space-y-4">
-                  {team.games?.phase?.game?.map((game) => (
-                    <Link
-                      key={game.gamecode}
-                      to={`/game/${game.gamecode}`}
-                      className="block p-4 rounded-lg bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors"
+              <div>
+                <h3 className="font-semibold mb-2">Social Media</h3>
+                <div className="space-y-1">
+                  {teamData.twitteraccount && (
+                    <a
+                      href={`https://twitter.com/${teamData.twitteraccount}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-sm text-blue-600 dark:text-blue-400 hover:underline block"
                     >
-                      <div className="flex justify-between items-center">
-                        <div>
-                          <p className="font-medium text-gray-900 dark:text-gray-100">
-                            {game.versus}
-                          </p>
-                          <p className="text-sm text-gray-500 dark:text-gray-400">
-                            {new Date(game.gamedate).toLocaleDateString()}
-                          </p>
-                        </div>
-                        <div className="text-right">
-                          <p className="font-medium text-gray-900 dark:text-gray-100">
-                            {game.played ? (
-                              `${game.standingslocalscore} - ${game.standingsroadscore}`
-                            ) : (
-                              "Upcoming"
-                            )}
-                          </p>
-                          <p className={`text-sm ${game.played ? (game.win === "1" ? "text-green-600 dark:text-green-400" : "text-red-600 dark:text-red-400") : "text-gray-500 dark:text-gray-400"}`}>
-                            {game.played ? (game.win === "1" ? "Win" : "Loss") : game.phase}
-                          </p>
-                        </div>
-                      </div>
-                    </Link>
-                  ))}
+                      Twitter
+                    </a>
+                  )}
+                  {clubV3Data?.instagramAccount && (
+                    <a
+                      href={`https://instagram.com/${clubV3Data.instagramAccount}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-sm text-blue-600 dark:text-blue-400 hover:underline block"
+                    >
+                      Instagram
+                    </a>
+                  )}
+                  {clubV3Data?.facebookAccount && (
+                    <a
+                      href={clubV3Data.facebookAccount}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-sm text-blue-600 dark:text-blue-400 hover:underline block"
+                    >
+                      Facebook
+                    </a>
+                  )}
                 </div>
-              </CardContent>
-            </Card>
-          </TabsContent>
-        </Tabs>
-      </div>
+              </div>
+            </TabsContent>
+
+            <TabsContent value="games">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {teamData.games.phase.game.map((game) => (
+                  <div key={game.gamecode} className="space-y-2">
+                    <div className="text-sm font-medium text-gray-500 dark:text-gray-400">
+                      {getGamePhase(game)}
+                    </div>
+                    <GameCard
+                      game={{
+                        gameCode: game.gamecode,
+                        dateTime: game.gamedate,
+                        homeTeam: {
+                          name: game.versustype === "L" ? teamData.name : game.versus,
+                        },
+                        awayTeam: {
+                          name: game.versustype === "R" ? teamData.name : game.versus,
+                        },
+                        homeScore: game.standingslocalscore,
+                        awayScore: game.standingsroadscore,
+                        status: game.played ? "FINAL" : "SCHEDULED",
+                      }}
+                    />
+                  </div>
+                ))}
+              </div>
+            </TabsContent>
+
+            <TabsContent value="roster">
+              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+                {teamData.roster.player.map((player) => (
+                  <Card key={player.code}>
+                    <CardContent className="p-4">
+                      <div className="font-semibold">{player.name}</div>
+                      <div className="text-sm text-gray-500 dark:text-gray-400">
+                        #{player.dorsal} - {player.position}
+                      </div>
+                      <div className="text-sm text-gray-500 dark:text-gray-400">
+                        {player.countryname}
+                      </div>
+                    </CardContent>
+                  </Card>
+                ))}
+              </div>
+            </TabsContent>
+          </Tabs>
+        </CardContent>
+      </Card>
     </div>
   );
 };

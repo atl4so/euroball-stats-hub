@@ -1,6 +1,6 @@
-import { Team } from "@/types/team";
-import { Card, CardContent } from "@/components/ui/card";
 import { Link } from "react-router-dom";
+import { Card, CardContent } from "@/components/ui/card";
+import { Team } from "@/types/team";
 import { ClubV3Response } from "@/services/euroleagueApi";
 
 interface TeamCardProps {
@@ -10,9 +10,9 @@ interface TeamCardProps {
 
 export const TeamCard = ({ team, v3Details }: TeamCardProps) => {
   return (
-    <Link to={`/team/${team.code.toLowerCase()}`}>
-      <Card className="overflow-hidden hover:shadow-lg transition-shadow h-[120px]">
-        <CardContent className="p-6 h-full">
+    <Link to={`/team/${team.code}`}>
+      <Card className="overflow-hidden transition-all duration-200 hover:shadow-lg">
+        <CardContent className="p-4">
           <div className="flex items-center gap-4 h-full">
             <div className="flex-shrink-0 w-16">
               <img
@@ -28,7 +28,7 @@ export const TeamCard = ({ team, v3Details }: TeamCardProps) => {
               </p>
               {v3Details?.venue && (
                 <p className="text-sm text-gray-500 dark:text-gray-400 truncate">
-                  {v3Details.venue.name} ({v3Details.venue.capacity.toLocaleString()} seats)
+                  {v3Details.venue.name}
                 </p>
               )}
             </div>
