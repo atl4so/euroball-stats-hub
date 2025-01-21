@@ -52,45 +52,47 @@ export const ScheduleList = ({ schedules, isLoading, currentRound, onPageChange 
       className="divide-y divide-gray-200 dark:divide-gray-800"
     >
       {schedules.map((schedule) => (
-        <Link to={`/game/${schedule.game}`} key={schedule.gamecode} className="block p-3 sm:p-4">
+        <Link to={`/game/${schedule.game}`} key={schedule.gamecode} className="block p-3 sm:p-4 hover:bg-blue-50/50 dark:hover:bg-blue-900/20 transition-colors">
           <motion.div
             variants={item}
-            className="block hover:bg-blue-50/50 dark:hover:bg-blue-900/20 transition-colors"
           >
-            <div className="block">
-              <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-2 gap-2">
-                <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200 w-fit">
-                  UPCOMING
-                </span>
-                <div className="text-xs sm:text-sm text-gray-500 dark:text-gray-400">
-                  {format(new Date(schedule.date), "MMM d, yyyy")} {schedule.startime}
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-2 gap-2">
+              <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200 w-fit">
+                UPCOMING
+              </span>
+              <div className="text-xs sm:text-sm text-gray-500 dark:text-gray-400">
+                {format(new Date(schedule.date), "MMM d, yyyy")} {schedule.startime}
+              </div>
+            </div>
+
+            <div className="grid grid-cols-[minmax(0,1fr),auto,minmax(0,1fr)] sm:grid-cols-[minmax(0,1fr),auto,minmax(0,1fr)] gap-2 sm:gap-8 items-center mb-3">
+              <div className="text-right space-y-1">
+                <div className="font-medium text-sm sm:text-base text-gray-900 dark:text-gray-100 truncate">{schedule.hometeam}</div>
+                <div className="text-2xl sm:text-3xl font-bold tabular-nums leading-none text-gray-600 dark:text-gray-400">
+                  -
                 </div>
               </div>
 
-              <div className="grid grid-cols-[1fr,auto,1fr] sm:grid-cols-3 gap-2 sm:gap-4 items-center">
-                <div className="text-right">
-                  <div className="font-medium text-sm sm:text-base text-gray-900 dark:text-gray-100">{schedule.hometeam}</div>
-                  <div className="text-xl sm:text-2xl font-bold tabular-nums text-gray-600 dark:text-gray-400">
-                    -
-                  </div>
-                </div>
-
-                <div className="text-center text-xs sm:text-sm font-medium text-gray-500 dark:text-gray-400 px-1">
+              <div className="flex flex-col items-center justify-center px-2 sm:px-4">
+                <div className="text-xs sm:text-sm font-medium text-gray-500 dark:text-gray-400 mb-1">
                   vs
                 </div>
-
-                <div className="text-left">
-                  <div className="font-medium text-sm sm:text-base text-gray-900 dark:text-gray-100">{schedule.awayteam}</div>
-                  <div className="text-xl sm:text-2xl font-bold tabular-nums text-gray-600 dark:text-gray-400">
-                    -
-                  </div>
+                <div className="text-[10px] uppercase tracking-wider text-gray-400 dark:text-gray-500 font-medium">
+                  {schedule.startime}
                 </div>
               </div>
 
-              <div className="mt-3 flex items-center gap-1 text-xs sm:text-sm text-gray-500 dark:text-gray-400">
-                <MapPin className="h-3 w-3 sm:h-4 sm:w-4 flex-shrink-0" />
-                <span className="truncate">{schedule.arenaname}</span>
+              <div className="text-left space-y-1">
+                <div className="font-medium text-sm sm:text-base text-gray-900 dark:text-gray-100 truncate">{schedule.awayteam}</div>
+                <div className="text-2xl sm:text-3xl font-bold tabular-nums leading-none text-gray-600 dark:text-gray-400">
+                  -
+                </div>
               </div>
+            </div>
+
+            <div className="flex items-center gap-1.5 text-xs sm:text-sm text-gray-500 dark:text-gray-400">
+              <MapPin className="h-3.5 w-3.5 flex-shrink-0" />
+              <span className="truncate">{schedule.arenaname}</span>
             </div>
           </motion.div>
         </Link>

@@ -87,11 +87,11 @@ export const GameList = ({ games, isLoading, currentRound, onPageChange }: GameL
                 </div>
               </div>
 
-              <div className="grid grid-cols-[1fr,auto,1fr] sm:grid-cols-3 gap-2 sm:gap-4 items-center">
-                <div className="text-right">
-                  <div className="font-medium text-sm sm:text-base text-gray-900 dark:text-gray-100">{game.hometeam}</div>
+              <div className="grid grid-cols-[minmax(0,1fr),auto,minmax(0,1fr)] sm:grid-cols-[minmax(0,1fr),auto,minmax(0,1fr)] gap-2 sm:gap-8 items-center">
+                <div className="text-right space-y-1">
+                  <div className="font-medium text-sm sm:text-base text-gray-900 dark:text-gray-100 truncate">{game.hometeam}</div>
                   <div className={cn(
-                    "text-xl sm:text-2xl font-bold tabular-nums",
+                    "text-2xl sm:text-3xl font-bold tabular-nums leading-none",
                     isFinal && Number(game.homescore) > Number(game.awayscore)
                       ? "text-blue-600 dark:text-blue-400"
                       : "text-gray-600 dark:text-gray-400"
@@ -100,14 +100,21 @@ export const GameList = ({ games, isLoading, currentRound, onPageChange }: GameL
                   </div>
                 </div>
 
-                <div className="text-center text-xs sm:text-sm font-medium text-gray-500 dark:text-gray-400 px-1">
-                  vs
+                <div className="flex flex-col items-center justify-center px-2 sm:px-4">
+                  <div className="text-xs sm:text-sm font-medium text-gray-500 dark:text-gray-400 mb-1">
+                    vs
+                  </div>
+                  {(game.homescore || game.awayscore) && (
+                    <div className="text-[10px] uppercase tracking-wider text-gray-400 dark:text-gray-500 font-medium">
+                      {isFinal ? "Final" : "Current"}
+                    </div>
+                  )}
                 </div>
 
-                <div className="text-left">
-                  <div className="font-medium text-sm sm:text-base text-gray-900 dark:text-gray-100">{game.awayteam}</div>
+                <div className="text-left space-y-1">
+                  <div className="font-medium text-sm sm:text-base text-gray-900 dark:text-gray-100 truncate">{game.awayteam}</div>
                   <div className={cn(
-                    "text-xl sm:text-2xl font-bold tabular-nums",
+                    "text-2xl sm:text-3xl font-bold tabular-nums leading-none",
                     isFinal && Number(game.awayscore) > Number(game.homescore)
                       ? "text-blue-600 dark:text-blue-400"
                       : "text-gray-600 dark:text-gray-400"
