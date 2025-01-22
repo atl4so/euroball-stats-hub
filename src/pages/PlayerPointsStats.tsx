@@ -1,10 +1,11 @@
+import React, { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Loader2 } from "lucide-react";
 import { PageBreadcrumb } from "@/components/PageBreadcrumb";
-import { useState } from "react";
+import { Button } from "@/components/ui/button";
 import {
   Pagination,
   PaginationContent,
@@ -153,10 +154,14 @@ const PlayerPointsStats = () => {
               <Pagination>
                 <PaginationContent>
                   <PaginationItem>
-                    <PaginationPrevious 
+                    <Button
+                      variant="ghost"
+                      size="sm"
                       onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
                       disabled={currentPage === 1}
-                    />
+                    >
+                      Previous
+                    </Button>
                   </PaginationItem>
                   
                   {Array.from({ length: totalPages }, (_, i) => i + 1)
@@ -169,7 +174,7 @@ const PlayerPointsStats = () => {
                       <React.Fragment key={page}>
                         {index > 0 && array[index - 1] !== page - 1 && (
                           <PaginationItem>
-                            <PaginationLink disabled>...</PaginationLink>
+                            <PaginationLink>...</PaginationLink>
                           </PaginationItem>
                         )}
                         <PaginationItem>
@@ -184,10 +189,14 @@ const PlayerPointsStats = () => {
                     ))}
                   
                   <PaginationItem>
-                    <PaginationNext 
+                    <Button
+                      variant="ghost"
+                      size="sm"
                       onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
                       disabled={currentPage === totalPages}
-                    />
+                    >
+                      Next
+                    </Button>
                   </PaginationItem>
                 </PaginationContent>
               </Pagination>
