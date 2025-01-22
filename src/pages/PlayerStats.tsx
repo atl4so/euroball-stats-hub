@@ -11,7 +11,6 @@ import {
   PaginationContent,
   PaginationItem,
 } from "@/components/ui/pagination";
-import { ScrollArea } from "@/components/ui/scroll-area";
 import PlayerStatsHeader from "@/components/player-stats/PlayerStatsHeader";
 import PlayerStatsRow from "@/components/player-stats/PlayerStatsRow";
 
@@ -71,20 +70,22 @@ const PlayerStats = () => {
           <CardTitle>Player Stats</CardTitle>
         </CardHeader>
         <CardContent>
-          <ScrollArea className="rounded-md border h-[600px]">
-            <Table>
-              <PlayerStatsHeader
-                sortColumn={sortColumn}
-                sortOrder={sortDirection}
-                onSort={handleSort}
-              />
-              <TableBody>
-                {paginatedStats?.map((stat) => (
-                  <PlayerStatsRow key={`${stat.player_name}-${stat.team_code}`} stat={stat} />
-                ))}
-              </TableBody>
-            </Table>
-          </ScrollArea>
+          <div className="w-full overflow-auto">
+            <div className="min-w-[1500px]">
+              <Table>
+                <PlayerStatsHeader
+                  sortColumn={sortColumn}
+                  sortOrder={sortDirection}
+                  onSort={handleSort}
+                />
+                <TableBody>
+                  {paginatedStats?.map((stat) => (
+                    <PlayerStatsRow key={`${stat.player_name}-${stat.team_code}`} stat={stat} />
+                  ))}
+                </TableBody>
+              </Table>
+            </div>
+          </div>
 
           <Pagination className="mt-4">
             <PaginationContent>
