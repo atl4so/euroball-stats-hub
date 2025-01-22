@@ -9,6 +9,7 @@ import Standings from "@/pages/Standings";
 import Teams from "@/pages/Teams";
 import TeamDetails from "@/pages/TeamDetails";
 import PlayerPointsStats from "@/pages/PlayerPointsStats";
+import PlayerStats from "@/pages/PlayerStats";
 
 const queryClient = new QueryClient();
 
@@ -41,6 +42,12 @@ function App() {
           >
             Player Points
           </Link>
+          <Link
+            to="/player-stats"
+            className="text-sm font-medium transition-colors hover:text-primary"
+          >
+            Player Stats
+          </Link>
         </nav>
         <Routes>
           <Route path="/" element={<Index />} />
@@ -50,6 +57,7 @@ function App() {
           <Route path="/teams" element={<Teams />} />
           <Route path="/team/:teamCode" element={<TeamDetails />} />
           <Route path="/player-points-stats" element={<PlayerPointsStats />} />
+          <Route path="/player-stats" element={<PlayerStats />} />
         </Routes>
         <Toaster />
       </ThemeProvider>
