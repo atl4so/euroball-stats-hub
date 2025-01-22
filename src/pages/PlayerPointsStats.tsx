@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { Table, TableBody } from "@/components/ui/table";
 import { Loader2 } from "lucide-react";
 import { PageBreadcrumb } from "@/components/PageBreadcrumb";
 import { Button } from "@/components/ui/button";
@@ -10,61 +10,52 @@ import {
   Pagination,
   PaginationContent,
   PaginationItem,
-  PaginationLink,
 } from "@/components/ui/pagination";
-
-const formatPercentage = (value: number | null) => {
-  if (value === null) return "0%";
-  return `${(value * 100).toFixed(1)}%`;
-};
+import { Alert, AlertDescription } from "@/components/ui/alert";
 
 const PlayerPointsStats = () => {
   const [currentPage, setCurrentPage] = useState(1);
-  const [sortColumn, setSortColumn] = useState("points_from_two_percentage");
-  const [sortOrder, setSortOrder] = useState<"asc" | "desc">("desc");
+  const [sortColumn, setSortColumn] = useState("player_name");
+  const [sortDirection, setSortDirection] = useState<"asc" | "desc">("asc");
   const pageSize = 10;
 
-  const { data: playerPoints, isLoading } = useQuery({
-    queryKey: ["player-points", sortColumn, sortOrder, currentPage],
+  const { data: stats, isLoading, error } = useQuery({
+    queryKey: ["player_points", sortColumn, sortDirection],
     queryFn: async () => {
+      console.log("Fetching player_points data...");
       const { data, error } = await supabase
         .from("player_points")
         .select("*")
-        .order(sortColumn, { ascending: sortOrder === "asc" })
-        .range((currentPage - 1) * pageSize, currentPage * pageSize - 1);
+        .order(sortColumn, { ascending: sortDirection === "asc" });
+
+      if (error) {
+        console.error("Error fetching data:", error);
+        throw error;
+      }
       
-      if (error) throw error;
+      console.log("Fetched data:", data);
       return data;
     },
   });
 
-  const { data: totalCount } = useQuery({
-    queryKey: ["player-points-count"],
-    queryFn: async () => {
-      const { count, error } = await supabase
-        .from("player_points")
-        .select("*", { count: "exact", head: true });
-      
-      if (error) throw error;
-      return count || 0;
-    },
-  });
-
-  const totalPages = Math.ceil((totalCount || 0) / pageSize);
-
-  const breadcrumbItems = [
-    { label: "Games", path: "/" },
-    { label: "Player Points Stats", path: "/player-points-stats" },
-  ];
-
   const handleSort = (column: string) => {
     if (sortColumn === column) {
-      setSortOrder(sortOrder === "asc" ? "desc" : "asc");
+      setSortDirection(sortDirection === "asc" ? "desc" : "asc");
     } else {
       setSortColumn(column);
-      setSortOrder("desc");
+      setSortDirection("desc");
     }
   };
+
+  const paginatedStats = stats?.slice(
+    (currentPage - 1) * pageSize,
+    currentPage * pageSize
+  );
+  const totalPages = stats ? Math.ceil(stats.length / pageSize) : 0;
+
+  const breadcrumbItems = [
+    { label: "Points Stats", path: "/player-points-stats" },
+  ];
 
   if (isLoading) {
     return (
@@ -74,190 +65,119 @@ const PlayerPointsStats = () => {
     );
   }
 
-  const getSortIndicator = (column: string) => {
-    if (sortColumn !== column) return "↕";
-    return sortOrder === "asc" ? "↑" : "↓";
-  };
+  if (error) {
+    return (
+      <div className="container mx-auto px-4 py-6">
+        <Alert variant="destructive">
+          <AlertDescription>
+            Error loading player points statistics. Please try again later.
+          </AlertDescription>
+        </Alert>
+      </div>
+    );
+  }
+
+  if (!stats || stats.length === 0) {
+    return (
+      <div className="container mx-auto px-4 py-6">
+        <Alert>
+          <AlertDescription>
+            No player points statistics available at the moment.
+          </AlertDescription>
+        </Alert>
+      </div>
+    );
+  }
 
   return (
-    <div className="container mx-auto px-4 py-8">
+    <div className="container mx-auto px-4 py-6">
       <PageBreadcrumb items={breadcrumbItems} />
-      
-      <div className="space-y-8">
-        <h1 className="text-3xl font-bold">Player Points Statistics</h1>
+      <h1 className="text-2xl font-bold mb-6">Player Points Statistics</h1>
 
-        <Card>
-          <CardHeader>
-            <CardTitle>Player Statistics</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="overflow-x-auto">
+      <Card>
+        <CardHeader>
+          <CardTitle>Points Stats</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="w-full overflow-auto">
+            <div className="min-w-[1500px]">
               <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead 
-                      className="cursor-pointer hover:bg-muted/50"
+                <thead>
+                  <tr>
+                    <th 
+                      className="sticky left-0 bg-background cursor-pointer hover:bg-muted/50"
                       onClick={() => handleSort("player_name")}
                     >
-                      Player {getSortIndicator("player_name")}
-                    </TableHead>
-                    <TableHead 
-                      className="cursor-pointer hover:bg-muted/50"
-                      onClick={() => handleSort("team_code")}
-                    >
-                      Team {getSortIndicator("team_code")}
-                    </TableHead>
-                    <TableHead 
-                      className="cursor-pointer hover:bg-muted/50"
-                      onClick={() => handleSort("season_code")}
-                    >
-                      Season {getSortIndicator("season_code")}
-                    </TableHead>
-                    <TableHead 
-                      className="cursor-pointer hover:bg-muted/50"
-                      onClick={() => handleSort("games_played")}
-                    >
-                      Games Played {getSortIndicator("games_played")}
-                    </TableHead>
-                    <TableHead 
-                      className="cursor-pointer hover:bg-muted/50"
-                      onClick={() => handleSort("games_started")}
-                    >
-                      Games Started {getSortIndicator("games_started")}
-                    </TableHead>
-                    <TableHead 
-                      className="cursor-pointer hover:bg-muted/50"
-                      onClick={() => handleSort("two_point_attempts_share")}
-                    >
-                      2PT Attempts Share {getSortIndicator("two_point_attempts_share")}
-                    </TableHead>
-                    <TableHead 
-                      className="cursor-pointer hover:bg-muted/50"
-                      onClick={() => handleSort("three_point_attempts_share")}
-                    >
-                      3PT Attempts Share {getSortIndicator("three_point_attempts_share")}
-                    </TableHead>
-                    <TableHead 
-                      className="cursor-pointer hover:bg-muted/50"
-                      onClick={() => handleSort("free_throw_attempts_share")}
-                    >
-                      FT Attempts Share {getSortIndicator("free_throw_attempts_share")}
-                    </TableHead>
-                    <TableHead 
-                      className="cursor-pointer hover:bg-muted/50"
-                      onClick={() => handleSort("two_points_made_share")}
-                    >
-                      2PT Made Share {getSortIndicator("two_points_made_share")}
-                    </TableHead>
-                    <TableHead 
-                      className="cursor-pointer hover:bg-muted/50"
-                      onClick={() => handleSort("three_points_made_share")}
-                    >
-                      3PT Made Share {getSortIndicator("three_points_made_share")}
-                    </TableHead>
-                    <TableHead 
-                      className="cursor-pointer hover:bg-muted/50"
-                      onClick={() => handleSort("free_throws_made_share")}
-                    >
-                      FT Made Share {getSortIndicator("free_throws_made_share")}
-                    </TableHead>
-                    <TableHead 
-                      className="cursor-pointer hover:bg-muted/50"
-                      onClick={() => handleSort("points_from_two_percentage")}
-                    >
-                      Points from 2PT {getSortIndicator("points_from_two_percentage")}
-                    </TableHead>
-                    <TableHead 
-                      className="cursor-pointer hover:bg-muted/50"
-                      onClick={() => handleSort("points_from_three_percentage")}
-                    >
-                      Points from 3PT {getSortIndicator("points_from_three_percentage")}
-                    </TableHead>
-                    <TableHead 
-                      className="cursor-pointer hover:bg-muted/50"
-                      onClick={() => handleSort("points_from_ft_percentage")}
-                    >
-                      Points from FT {getSortIndicator("points_from_ft_percentage")}
-                    </TableHead>
-                  </TableRow>
-                </TableHeader>
+                      Player {sortColumn === "player_name" ? (sortDirection === "asc" ? "↑" : "↓") : "↕"}
+                    </th>
+                    <th onClick={() => handleSort("team_code")}>Team {sortColumn === "team_code" ? (sortDirection === "asc" ? "↑" : "↓") : "↕"}</th>
+                    <th onClick={() => handleSort("season_code")}>Season {sortColumn === "season_code" ? (sortDirection === "asc" ? "↑" : "↓") : "↕"}</th>
+                    <th onClick={() => handleSort("games_played")}>GP {sortColumn === "games_played" ? (sortDirection === "asc" ? "↑" : "↓") : "↕"}</th>
+                    <th onClick={() => handleSort("games_started")}>GS {sortColumn === "games_started" ? (sortDirection === "asc" ? "↑" : "↓") : "↕"}</th>
+                    <th onClick={() => handleSort("two_point_attempts_share")}>2PA% {sortColumn === "two_point_attempts_share" ? (sortDirection === "asc" ? "↑" : "↓") : "↕"}</th>
+                    <th onClick={() => handleSort("three_point_attempts_share")}>3PA% {sortColumn === "three_point_attempts_share" ? (sortDirection === "asc" ? "↑" : "↓") : "↕"}</th>
+                    <th onClick={() => handleSort("free_throw_attempts_share")}>FTA% {sortColumn === "free_throw_attempts_share" ? (sortDirection === "asc" ? "↑" : "↓") : "↕"}</th>
+                    <th onClick={() => handleSort("two_points_made_share")}>2PM% {sortColumn === "two_points_made_share" ? (sortDirection === "asc" ? "↑" : "↓") : "↕"}</th>
+                    <th onClick={() => handleSort("three_points_made_share")}>3PM% {sortColumn === "three_points_made_share" ? (sortDirection === "asc" ? "↑" : "↓") : "↕"}</th>
+                    <th onClick={() => handleSort("free_throws_made_share")}>FTM% {sortColumn === "free_throws_made_share" ? (sortDirection === "asc" ? "↑" : "↓") : "↕"}</th>
+                    <th onClick={() => handleSort("points_from_two_percentage")}>PTS from 2 {sortColumn === "points_from_two_percentage" ? (sortDirection === "asc" ? "↑" : "↓") : "↕"}</th>
+                    <th onClick={() => handleSort("points_from_three_percentage")}>PTS from 3 {sortColumn === "points_from_three_percentage" ? (sortDirection === "asc" ? "↑" : "↓") : "↕"}</th>
+                    <th onClick={() => handleSort("points_from_ft_percentage")}>PTS from FT {sortColumn === "points_from_ft_percentage" ? (sortDirection === "asc" ? "↑" : "↓") : "↕"}</th>
+                  </tr>
+                </thead>
                 <TableBody>
-                  {playerPoints?.map((player) => (
-                    <TableRow key={`${player.player_name}-${player.team_code}`}>
-                      <TableCell className="font-medium">{player.player_name}</TableCell>
-                      <TableCell>{player.team_code}</TableCell>
-                      <TableCell>{player.season_code}</TableCell>
-                      <TableCell>{player.games_played}</TableCell>
-                      <TableCell>{player.games_started}</TableCell>
-                      <TableCell>{formatPercentage(player.two_point_attempts_share)}</TableCell>
-                      <TableCell>{formatPercentage(player.three_point_attempts_share)}</TableCell>
-                      <TableCell>{formatPercentage(player.free_throw_attempts_share)}</TableCell>
-                      <TableCell>{formatPercentage(player.two_points_made_share)}</TableCell>
-                      <TableCell>{formatPercentage(player.three_points_made_share)}</TableCell>
-                      <TableCell>{formatPercentage(player.free_throws_made_share)}</TableCell>
-                      <TableCell>{formatPercentage(player.points_from_two_percentage)}</TableCell>
-                      <TableCell>{formatPercentage(player.points_from_three_percentage)}</TableCell>
-                      <TableCell>{formatPercentage(player.points_from_ft_percentage)}</TableCell>
-                    </TableRow>
+                  {paginatedStats?.map((stat) => (
+                    <tr key={`${stat.player_name}-${stat.team_code}`}>
+                      <td className="sticky left-0 bg-background">{stat.player_name}</td>
+                      <td>{stat.team_code}</td>
+                      <td>{stat.season_code}</td>
+                      <td>{stat.games_played}</td>
+                      <td>{stat.games_started}</td>
+                      <td>{stat.two_point_attempts_share?.toFixed(1)}%</td>
+                      <td>{stat.three_point_attempts_share?.toFixed(1)}%</td>
+                      <td>{stat.free_throw_attempts_share?.toFixed(1)}%</td>
+                      <td>{stat.two_points_made_share?.toFixed(1)}%</td>
+                      <td>{stat.three_points_made_share?.toFixed(1)}%</td>
+                      <td>{stat.free_throws_made_share?.toFixed(1)}%</td>
+                      <td>{stat.points_from_two_percentage?.toFixed(1)}%</td>
+                      <td>{stat.points_from_three_percentage?.toFixed(1)}%</td>
+                      <td>{stat.points_from_ft_percentage?.toFixed(1)}%</td>
+                    </tr>
                   ))}
                 </TableBody>
               </Table>
             </div>
+          </div>
 
-            <div className="mt-4">
-              <Pagination>
-                <PaginationContent>
-                  <PaginationItem>
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
-                      disabled={currentPage === 1}
-                    >
-                      Previous
-                    </Button>
-                  </PaginationItem>
-                  
-                  {Array.from({ length: totalPages }, (_, i) => i + 1)
-                    .filter(page => 
-                      page === 1 || 
-                      page === totalPages || 
-                      Math.abs(currentPage - page) <= 2
-                    )
-                    .map((page, index, array) => (
-                      <React.Fragment key={page}>
-                        {index > 0 && array[index - 1] !== page - 1 && (
-                          <PaginationItem>
-                            <PaginationLink>...</PaginationLink>
-                          </PaginationItem>
-                        )}
-                        <PaginationItem>
-                          <PaginationLink
-                            onClick={() => setCurrentPage(page)}
-                            isActive={currentPage === page}
-                          >
-                            {page}
-                          </PaginationLink>
-                        </PaginationItem>
-                      </React.Fragment>
-                    ))}
-                  
-                  <PaginationItem>
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
-                      disabled={currentPage === totalPages}
-                    >
-                      Next
-                    </Button>
-                  </PaginationItem>
-                </PaginationContent>
-              </Pagination>
-            </div>
-          </CardContent>
-        </Card>
-      </div>
+          <Pagination className="mt-4">
+            <PaginationContent>
+              <PaginationItem>
+                <Button
+                  variant="outline"
+                  onClick={() => setCurrentPage(currentPage - 1)}
+                  disabled={currentPage === 1}
+                >
+                  Previous
+                </Button>
+              </PaginationItem>
+              <PaginationItem>
+                <span className="px-4">
+                  Page {currentPage} of {totalPages}
+                </span>
+              </PaginationItem>
+              <PaginationItem>
+                <Button
+                  variant="outline"
+                  onClick={() => setCurrentPage(currentPage + 1)}
+                  disabled={currentPage === totalPages}
+                >
+                  Next
+                </Button>
+              </PaginationItem>
+            </PaginationContent>
+          </Pagination>
+        </CardContent>
+      </Card>
     </div>
   );
 };
