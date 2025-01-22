@@ -11,8 +11,6 @@ import {
   PaginationContent,
   PaginationItem,
   PaginationLink,
-  PaginationNext,
-  PaginationPrevious,
 } from "@/components/ui/pagination";
 
 const formatPercentage = (value: number | null) => {
@@ -90,7 +88,7 @@ const PlayerPointsStats = () => {
 
         <Card>
           <CardHeader>
-            <CardTitle>Top Players Statistics</CardTitle>
+            <CardTitle>Player Statistics</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="overflow-x-auto">
@@ -111,27 +109,75 @@ const PlayerPointsStats = () => {
                     </TableHead>
                     <TableHead 
                       className="cursor-pointer hover:bg-muted/50"
+                      onClick={() => handleSort("season_code")}
+                    >
+                      Season {getSortIndicator("season_code")}
+                    </TableHead>
+                    <TableHead 
+                      className="cursor-pointer hover:bg-muted/50"
                       onClick={() => handleSort("games_played")}
                     >
-                      Games {getSortIndicator("games_played")}
+                      Games Played {getSortIndicator("games_played")}
+                    </TableHead>
+                    <TableHead 
+                      className="cursor-pointer hover:bg-muted/50"
+                      onClick={() => handleSort("games_started")}
+                    >
+                      Games Started {getSortIndicator("games_started")}
+                    </TableHead>
+                    <TableHead 
+                      className="cursor-pointer hover:bg-muted/50"
+                      onClick={() => handleSort("two_point_attempts_share")}
+                    >
+                      2PT Attempts Share {getSortIndicator("two_point_attempts_share")}
+                    </TableHead>
+                    <TableHead 
+                      className="cursor-pointer hover:bg-muted/50"
+                      onClick={() => handleSort("three_point_attempts_share")}
+                    >
+                      3PT Attempts Share {getSortIndicator("three_point_attempts_share")}
+                    </TableHead>
+                    <TableHead 
+                      className="cursor-pointer hover:bg-muted/50"
+                      onClick={() => handleSort("free_throw_attempts_share")}
+                    >
+                      FT Attempts Share {getSortIndicator("free_throw_attempts_share")}
+                    </TableHead>
+                    <TableHead 
+                      className="cursor-pointer hover:bg-muted/50"
+                      onClick={() => handleSort("two_points_made_share")}
+                    >
+                      2PT Made Share {getSortIndicator("two_points_made_share")}
+                    </TableHead>
+                    <TableHead 
+                      className="cursor-pointer hover:bg-muted/50"
+                      onClick={() => handleSort("three_points_made_share")}
+                    >
+                      3PT Made Share {getSortIndicator("three_points_made_share")}
+                    </TableHead>
+                    <TableHead 
+                      className="cursor-pointer hover:bg-muted/50"
+                      onClick={() => handleSort("free_throws_made_share")}
+                    >
+                      FT Made Share {getSortIndicator("free_throws_made_share")}
                     </TableHead>
                     <TableHead 
                       className="cursor-pointer hover:bg-muted/50"
                       onClick={() => handleSort("points_from_two_percentage")}
                     >
-                      2PT% {getSortIndicator("points_from_two_percentage")}
+                      Points from 2PT {getSortIndicator("points_from_two_percentage")}
                     </TableHead>
                     <TableHead 
                       className="cursor-pointer hover:bg-muted/50"
                       onClick={() => handleSort("points_from_three_percentage")}
                     >
-                      3PT% {getSortIndicator("points_from_three_percentage")}
+                      Points from 3PT {getSortIndicator("points_from_three_percentage")}
                     </TableHead>
                     <TableHead 
                       className="cursor-pointer hover:bg-muted/50"
                       onClick={() => handleSort("points_from_ft_percentage")}
                     >
-                      FT% {getSortIndicator("points_from_ft_percentage")}
+                      Points from FT {getSortIndicator("points_from_ft_percentage")}
                     </TableHead>
                   </TableRow>
                 </TableHeader>
@@ -140,7 +186,15 @@ const PlayerPointsStats = () => {
                     <TableRow key={`${player.player_name}-${player.team_code}`}>
                       <TableCell className="font-medium">{player.player_name}</TableCell>
                       <TableCell>{player.team_code}</TableCell>
+                      <TableCell>{player.season_code}</TableCell>
                       <TableCell>{player.games_played}</TableCell>
+                      <TableCell>{player.games_started}</TableCell>
+                      <TableCell>{formatPercentage(player.two_point_attempts_share)}</TableCell>
+                      <TableCell>{formatPercentage(player.three_point_attempts_share)}</TableCell>
+                      <TableCell>{formatPercentage(player.free_throw_attempts_share)}</TableCell>
+                      <TableCell>{formatPercentage(player.two_points_made_share)}</TableCell>
+                      <TableCell>{formatPercentage(player.three_points_made_share)}</TableCell>
+                      <TableCell>{formatPercentage(player.free_throws_made_share)}</TableCell>
                       <TableCell>{formatPercentage(player.points_from_two_percentage)}</TableCell>
                       <TableCell>{formatPercentage(player.points_from_three_percentage)}</TableCell>
                       <TableCell>{formatPercentage(player.points_from_ft_percentage)}</TableCell>
