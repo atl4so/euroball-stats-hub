@@ -34,7 +34,7 @@ export const GameCard = ({ game }: GameCardProps) => {
   };
 
   return (
-    <Link to={`/game/${game.gameCode}`}>
+    <Link to={`/game/${game.gamecode}`}>
       <Card className={`
         overflow-hidden transition-all duration-200 hover:shadow-lg
         ${isLive ? "bg-gradient-to-br from-green-50 to-emerald-50 dark:from-green-950/50 dark:to-emerald-950/50 border-green-200 dark:border-green-800" : ""}
@@ -42,7 +42,11 @@ export const GameCard = ({ game }: GameCardProps) => {
       `}>
         <CardContent className="p-4 space-y-4">
           <div className="flex items-center justify-between mb-2">
-            <GameStatus status={game.status} time={game.time || getGameTime()} />
+            <GameStatus 
+              played={game.played} 
+              date={game.date} 
+              time={game.time} 
+            />
             <div className="text-sm text-gray-500 dark:text-gray-400">
               {getGameDate()}
             </div>
@@ -50,9 +54,9 @@ export const GameCard = ({ game }: GameCardProps) => {
 
           <div className="grid grid-cols-3 gap-2 items-center">
             <div className="text-right space-y-1">
-              <div className="font-semibold truncate">{game.homeTeam.name}</div>
+              <div className="font-semibold truncate">{game.hometeam}</div>
               <div className={`text-2xl font-bold ${isLive ? "text-green-600 dark:text-green-400" : ""}`}>
-                {game.homeScore || "-"}
+                {game.homescore || "-"}
               </div>
             </div>
 
@@ -61,18 +65,17 @@ export const GameCard = ({ game }: GameCardProps) => {
             </div>
 
             <div className="text-left space-y-1">
-              <div className="font-semibold truncate">{game.awayTeam.name}</div>
+              <div className="font-semibold truncate">{game.awayteam}</div>
               <div className={`text-2xl font-bold ${isLive ? "text-green-600 dark:text-green-400" : ""}`}>
-                {game.awayScore || "-"}
+                {game.awayscore || "-"}
               </div>
             </div>
           </div>
 
           <div className="mt-2">
             <GameLocation
-              stadium={game.stadium}
-              stadiumname={game.stadiumname}
-              attendance={game.attendance}
+              stadiumname={game.stadiumname || ""}
+              attendance={game.attendance || ""}
             />
           </div>
         </CardContent>

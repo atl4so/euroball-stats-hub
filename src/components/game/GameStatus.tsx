@@ -2,7 +2,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { format } from "date-fns";
 import { Calendar, Clock } from "lucide-react";
 
-interface GameStatusProps {
+export interface GameStatusProps {
   played: boolean;
   date: string;
   time: string;

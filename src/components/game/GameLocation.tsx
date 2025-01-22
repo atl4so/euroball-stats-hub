@@ -1,7 +1,7 @@
 import { Card, CardContent } from "@/components/ui/card";
 import { MapPin, Users } from "lucide-react";
 
-interface GameLocationProps {
+export interface GameLocationProps {
   stadiumname: string;
   attendance: string;
 }

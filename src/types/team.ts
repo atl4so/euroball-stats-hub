@@ -16,6 +16,11 @@ export interface Team {
   website: string;
   ticketsurl: string;
   twitteraccount: string;
+  images?: {
+    logo?: string;
+  };
+  city?: string;
+  country?: string;
   arena: {
     name: string;
   };
@@ -39,6 +44,7 @@ export interface Team {
         loss: string;
         versustype: string;
         versus: string;
+        phase?: string;
       }>;
     };
   };
