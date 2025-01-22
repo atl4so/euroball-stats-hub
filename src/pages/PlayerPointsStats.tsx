@@ -8,8 +8,13 @@ import {
   ChartTooltip,
   ChartTooltipContent,
 } from "@/components/ui/chart";
-import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Cell } from "recharts";
+import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer } from "recharts";
 import { PageBreadcrumb } from "@/components/PageBreadcrumb";
+
+const formatPercentage = (value: number | null) => {
+  if (value === null) return "0%";
+  return `${(value * 100).toFixed(1)}%`;
+};
 
 const PlayerPointsStats = () => {
   const { data: playerPoints, isLoading } = useQuery({
@@ -40,9 +45,9 @@ const PlayerPointsStats = () => {
 
   const chartData = playerPoints?.slice(0, 10).map((player) => ({
     name: player.player_name,
-    twoPoints: Number(player.points_from_two_percentage) || 0,
-    threePoints: Number(player.points_from_three_percentage) || 0,
-    freeThrows: Number(player.points_from_ft_percentage) || 0,
+    twoPoints: Number(player.points_from_two_percentage || 0),
+    threePoints: Number(player.points_from_three_percentage || 0),
+    freeThrows: Number(player.points_from_ft_percentage || 0),
   }));
 
   return (
@@ -73,8 +78,12 @@ const PlayerPointsStats = () => {
                   <ResponsiveContainer width="100%" height="100%">
                     <BarChart data={chartData}>
                       <XAxis dataKey="name" angle={-45} textAnchor="end" height={70} />
-                      <YAxis />
-                      <Tooltip content={<ChartTooltipContent />} />
+                      <YAxis tickFormatter={(value) => `${(value * 100).toFixed(0)}%`} />
+                      <Tooltip 
+                        content={<ChartTooltipContent 
+                          formatter={(value: number) => [`${(value * 100).toFixed(1)}%`]} 
+                        />} 
+                      />
                       <Bar dataKey="twoPoints" name="2PT%" stackId="a" fill="var(--color-twoPoints)" />
                       <Bar dataKey="threePoints" name="3PT%" stackId="a" fill="var(--color-threePoints)" />
                       <Bar dataKey="freeThrows" name="FT%" stackId="a" fill="var(--color-freeThrows)" />
@@ -106,14 +115,18 @@ const PlayerPointsStats = () => {
                     <BarChart
                       data={playerPoints?.slice(0, 10).map((player) => ({
                         name: player.player_name,
-                        twoPointAttempts: Number(player.two_point_attempts_share) || 0,
-                        threePointAttempts: Number(player.three_point_attempts_share) || 0,
-                        freeThrowAttempts: Number(player.free_throw_attempts_share) || 0,
+                        twoPointAttempts: Number(player.two_point_attempts_share || 0),
+                        threePointAttempts: Number(player.three_point_attempts_share || 0),
+                        freeThrowAttempts: Number(player.free_throw_attempts_share || 0),
                       }))}
                     >
                       <XAxis dataKey="name" angle={-45} textAnchor="end" height={70} />
-                      <YAxis />
-                      <Tooltip content={<ChartTooltipContent />} />
+                      <YAxis tickFormatter={(value) => `${(value * 100).toFixed(0)}%`} />
+                      <Tooltip 
+                        content={<ChartTooltipContent 
+                          formatter={(value: number) => [`${(value * 100).toFixed(1)}%`]} 
+                        />} 
+                      />
                       <Bar
                         dataKey="twoPointAttempts"
                         name="2PT Attempts"
@@ -168,15 +181,15 @@ const PlayerPointsStats = () => {
                       <TableCell>{player.team_code}</TableCell>
                       <TableCell>{player.games_played}</TableCell>
                       <TableCell>{player.games_started}</TableCell>
-                      <TableCell>{player.two_point_attempts_share}%</TableCell>
-                      <TableCell>{player.three_point_attempts_share}%</TableCell>
-                      <TableCell>{player.free_throw_attempts_share}%</TableCell>
-                      <TableCell>{player.two_points_made_share}%</TableCell>
-                      <TableCell>{player.three_points_made_share}%</TableCell>
-                      <TableCell>{player.free_throws_made_share}%</TableCell>
-                      <TableCell>{player.points_from_two_percentage}%</TableCell>
-                      <TableCell>{player.points_from_three_percentage}%</TableCell>
-                      <TableCell>{player.points_from_ft_percentage}%</TableCell>
+                      <TableCell>{formatPercentage(player.two_point_attempts_share)}</TableCell>
+                      <TableCell>{formatPercentage(player.three_point_attempts_share)}</TableCell>
+                      <TableCell>{formatPercentage(player.free_throw_attempts_share)}</TableCell>
+                      <TableCell>{formatPercentage(player.two_points_made_share)}</TableCell>
+                      <TableCell>{formatPercentage(player.three_points_made_share)}</TableCell>
+                      <TableCell>{formatPercentage(player.free_throws_made_share)}</TableCell>
+                      <TableCell>{formatPercentage(player.points_from_two_percentage)}</TableCell>
+                      <TableCell>{formatPercentage(player.points_from_three_percentage)}</TableCell>
+                      <TableCell>{formatPercentage(player.points_from_ft_percentage)}</TableCell>
                     </TableRow>
                   ))}
                 </TableBody>
