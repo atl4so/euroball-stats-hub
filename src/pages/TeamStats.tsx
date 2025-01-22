@@ -52,41 +52,43 @@ const TeamStats = () => {
       <h1 className="text-2xl font-bold">Team Statistics</h1>
       <Card>
         <ScrollArea className="h-[600px] rounded-md">
-          <div className="overflow-x-auto">
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Team</TableHead>
-                  <TableHead className="text-right">Games</TableHead>
-                  <TableHead className="text-right">Points</TableHead>
-                  <TableHead className="text-right">2PT%</TableHead>
-                  <TableHead className="text-right">3PT%</TableHead>
-                  <TableHead className="text-right">FT%</TableHead>
-                  <TableHead className="text-right">Rebounds</TableHead>
-                  <TableHead className="text-right">Assists</TableHead>
-                  <TableHead className="text-right">Steals</TableHead>
-                  <TableHead className="text-right">Blocks</TableHead>
-                  <TableHead className="text-right">PIR</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {stats?.map((stat) => (
-                  <TableRow key={stat.id}>
-                    <TableCell className="font-medium">{stat.team_code}</TableCell>
-                    <TableCell className="text-right">{stat.games_played}</TableCell>
-                    <TableCell className="text-right">{Number(stat.points).toFixed(1)}</TableCell>
-                    <TableCell className="text-right">{stat.two_points_percentage}</TableCell>
-                    <TableCell className="text-right">{stat.three_points_percentage}</TableCell>
-                    <TableCell className="text-right">{stat.free_throws_percentage}</TableCell>
-                    <TableCell className="text-right">{Number(stat.total_rebounds).toFixed(1)}</TableCell>
-                    <TableCell className="text-right">{Number(stat.assists).toFixed(1)}</TableCell>
-                    <TableCell className="text-right">{Number(stat.steals).toFixed(1)}</TableCell>
-                    <TableCell className="text-right">{Number(stat.blocks).toFixed(1)}</TableCell>
-                    <TableCell className="text-right">{Number(stat.pir).toFixed(1)}</TableCell>
+          <div className="w-full overflow-x-scroll">
+            <div className="min-w-[1000px]">
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Team</TableHead>
+                    <TableHead className="text-right">Games</TableHead>
+                    <TableHead className="text-right">Points</TableHead>
+                    <TableHead className="text-right">2PT%</TableHead>
+                    <TableHead className="text-right">3PT%</TableHead>
+                    <TableHead className="text-right">FT%</TableHead>
+                    <TableHead className="text-right">Rebounds</TableHead>
+                    <TableHead className="text-right">Assists</TableHead>
+                    <TableHead className="text-right">Steals</TableHead>
+                    <TableHead className="text-right">Blocks</TableHead>
+                    <TableHead className="text-right">PIR</TableHead>
                   </TableRow>
-                ))}
-              </TableBody>
-            </Table>
+                </TableHeader>
+                <TableBody>
+                  {stats?.map((stat) => (
+                    <TableRow key={stat.id}>
+                      <TableCell className="font-medium">{stat.team_code}</TableCell>
+                      <TableCell className="text-right">{stat.games_played}</TableCell>
+                      <TableCell className="text-right">{Number(stat.points).toFixed(1)}</TableCell>
+                      <TableCell className="text-right">{(Number(stat.two_points_percentage) * 100).toFixed(1)}%</TableCell>
+                      <TableCell className="text-right">{(Number(stat.three_points_percentage) * 100).toFixed(1)}%</TableCell>
+                      <TableCell className="text-right">{(Number(stat.free_throws_percentage) * 100).toFixed(1)}%</TableCell>
+                      <TableCell className="text-right">{Number(stat.total_rebounds).toFixed(1)}</TableCell>
+                      <TableCell className="text-right">{Number(stat.assists).toFixed(1)}</TableCell>
+                      <TableCell className="text-right">{Number(stat.steals).toFixed(1)}</TableCell>
+                      <TableCell className="text-right">{Number(stat.blocks).toFixed(1)}</TableCell>
+                      <TableCell className="text-right">{Number(stat.pir).toFixed(1)}</TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </div>
           </div>
         </ScrollArea>
       </Card>
