@@ -2,14 +2,17 @@ import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { ChartPie, ChartBar, Loader2 } from "lucide-react";
-import {
-  ChartContainer,
-  ChartTooltip,
-  ChartTooltipContent,
-} from "@/components/ui/chart";
-import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer } from "recharts";
+import { Loader2 } from "lucide-react";
 import { PageBreadcrumb } from "@/components/PageBreadcrumb";
+import { useState } from "react";
+import {
+  Pagination,
+  PaginationContent,
+  PaginationItem,
+  PaginationLink,
+  PaginationNext,
+  PaginationPrevious,
+} from "@/components/ui/pagination";
 
 const formatPercentage = (value: number | null) => {
   if (value === null) return "0%";
@@ -17,23 +20,52 @@ const formatPercentage = (value: number | null) => {
 };
 
 const PlayerPointsStats = () => {
+  const [currentPage, setCurrentPage] = useState(1);
+  const [sortColumn, setSortColumn] = useState("points_from_two_percentage");
+  const [sortOrder, setSortOrder] = useState<"asc" | "desc">("desc");
+  const pageSize = 10;
+
   const { data: playerPoints, isLoading } = useQuery({
-    queryKey: ["player-points"],
+    queryKey: ["player-points", sortColumn, sortOrder, currentPage],
     queryFn: async () => {
       const { data, error } = await supabase
         .from("player_points")
         .select("*")
-        .order("points_from_two_percentage", { ascending: false });
+        .order(sortColumn, { ascending: sortOrder === "asc" })
+        .range((currentPage - 1) * pageSize, currentPage * pageSize - 1);
       
       if (error) throw error;
       return data;
     },
   });
 
+  const { data: totalCount } = useQuery({
+    queryKey: ["player-points-count"],
+    queryFn: async () => {
+      const { count, error } = await supabase
+        .from("player_points")
+        .select("*", { count: "exact", head: true });
+      
+      if (error) throw error;
+      return count || 0;
+    },
+  });
+
+  const totalPages = Math.ceil((totalCount || 0) / pageSize);
+
   const breadcrumbItems = [
     { label: "Games", path: "/" },
     { label: "Player Points Stats", path: "/player-points-stats" },
   ];
+
+  const handleSort = (column: string) => {
+    if (sortColumn === column) {
+      setSortOrder(sortOrder === "asc" ? "desc" : "asc");
+    } else {
+      setSortColumn(column);
+      setSortOrder("desc");
+    }
+  };
 
   if (isLoading) {
     return (
@@ -43,12 +75,10 @@ const PlayerPointsStats = () => {
     );
   }
 
-  const chartData = playerPoints?.slice(0, 10).map((player) => ({
-    name: player.player_name,
-    twoPoints: Number(player.points_from_two_percentage || 0),
-    threePoints: Number(player.points_from_three_percentage || 0),
-    freeThrows: Number(player.points_from_ft_percentage || 0),
-  }));
+  const getSortIndicator = (column: string) => {
+    if (sortColumn !== column) return "↕";
+    return sortOrder === "asc" ? "↑" : "↓";
+  };
 
   return (
     <div className="container mx-auto px-4 py-8">
@@ -57,136 +87,59 @@ const PlayerPointsStats = () => {
       <div className="space-y-8">
         <h1 className="text-3xl font-bold">Player Points Statistics</h1>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">
-                Points Distribution
-              </CardTitle>
-              <ChartPie className="h-4 w-4 text-muted-foreground" />
-            </CardHeader>
-            <CardContent>
-              <div className="h-[300px]">
-                <ChartContainer
-                  className="w-full h-full"
-                  config={{
-                    twoPoints: { color: "#22c55e" },
-                    threePoints: { color: "#3b82f6" },
-                    freeThrows: { color: "#f59e0b" },
-                  }}
-                >
-                  <ResponsiveContainer width="100%" height="100%">
-                    <BarChart data={chartData}>
-                      <XAxis dataKey="name" angle={-45} textAnchor="end" height={70} />
-                      <YAxis tickFormatter={(value) => `${(value * 100).toFixed(0)}%`} />
-                      <Tooltip 
-                        content={<ChartTooltipContent 
-                          formatter={(value: number) => [`${(value * 100).toFixed(1)}%`]} 
-                        />} 
-                      />
-                      <Bar dataKey="twoPoints" name="2PT%" stackId="a" fill="var(--color-twoPoints)" />
-                      <Bar dataKey="threePoints" name="3PT%" stackId="a" fill="var(--color-threePoints)" />
-                      <Bar dataKey="freeThrows" name="FT%" stackId="a" fill="var(--color-freeThrows)" />
-                    </BarChart>
-                  </ResponsiveContainer>
-                </ChartContainer>
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">
-                Shot Attempts Distribution
-              </CardTitle>
-              <ChartBar className="h-4 w-4 text-muted-foreground" />
-            </CardHeader>
-            <CardContent>
-              <div className="h-[300px]">
-                <ChartContainer
-                  className="w-full h-full"
-                  config={{
-                    twoPointAttempts: { color: "#22c55e" },
-                    threePointAttempts: { color: "#3b82f6" },
-                    freeThrowAttempts: { color: "#f59e0b" },
-                  }}
-                >
-                  <ResponsiveContainer width="100%" height="100%">
-                    <BarChart
-                      data={playerPoints?.slice(0, 10).map((player) => ({
-                        name: player.player_name,
-                        twoPointAttempts: Number(player.two_point_attempts_share || 0),
-                        threePointAttempts: Number(player.three_point_attempts_share || 0),
-                        freeThrowAttempts: Number(player.free_throw_attempts_share || 0),
-                      }))}
-                    >
-                      <XAxis dataKey="name" angle={-45} textAnchor="end" height={70} />
-                      <YAxis tickFormatter={(value) => `${(value * 100).toFixed(0)}%`} />
-                      <Tooltip 
-                        content={<ChartTooltipContent 
-                          formatter={(value: number) => [`${(value * 100).toFixed(1)}%`]} 
-                        />} 
-                      />
-                      <Bar
-                        dataKey="twoPointAttempts"
-                        name="2PT Attempts"
-                        fill="var(--color-twoPointAttempts)"
-                      />
-                      <Bar
-                        dataKey="threePointAttempts"
-                        name="3PT Attempts"
-                        fill="var(--color-threePointAttempts)"
-                      />
-                      <Bar
-                        dataKey="freeThrowAttempts"
-                        name="FT Attempts"
-                        fill="var(--color-freeThrowAttempts)"
-                      />
-                    </BarChart>
-                  </ResponsiveContainer>
-                </ChartContainer>
-              </div>
-            </CardContent>
-          </Card>
-        </div>
-
         <Card>
           <CardHeader>
-            <CardTitle>Detailed Player Points Statistics</CardTitle>
+            <CardTitle>Top Players Statistics</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="overflow-x-auto">
               <Table>
                 <TableHeader>
                   <TableRow>
-                    <TableHead>Player</TableHead>
-                    <TableHead>Team</TableHead>
-                    <TableHead>Games Played</TableHead>
-                    <TableHead>Games Started</TableHead>
-                    <TableHead>2PT Attempts %</TableHead>
-                    <TableHead>3PT Attempts %</TableHead>
-                    <TableHead>FT Attempts %</TableHead>
-                    <TableHead>2PT Made %</TableHead>
-                    <TableHead>3PT Made %</TableHead>
-                    <TableHead>FT Made %</TableHead>
-                    <TableHead>Points from 2PT %</TableHead>
-                    <TableHead>Points from 3PT %</TableHead>
-                    <TableHead>Points from FT %</TableHead>
+                    <TableHead 
+                      className="cursor-pointer hover:bg-muted/50"
+                      onClick={() => handleSort("player_name")}
+                    >
+                      Player {getSortIndicator("player_name")}
+                    </TableHead>
+                    <TableHead 
+                      className="cursor-pointer hover:bg-muted/50"
+                      onClick={() => handleSort("team_code")}
+                    >
+                      Team {getSortIndicator("team_code")}
+                    </TableHead>
+                    <TableHead 
+                      className="cursor-pointer hover:bg-muted/50"
+                      onClick={() => handleSort("games_played")}
+                    >
+                      Games {getSortIndicator("games_played")}
+                    </TableHead>
+                    <TableHead 
+                      className="cursor-pointer hover:bg-muted/50"
+                      onClick={() => handleSort("points_from_two_percentage")}
+                    >
+                      2PT% {getSortIndicator("points_from_two_percentage")}
+                    </TableHead>
+                    <TableHead 
+                      className="cursor-pointer hover:bg-muted/50"
+                      onClick={() => handleSort("points_from_three_percentage")}
+                    >
+                      3PT% {getSortIndicator("points_from_three_percentage")}
+                    </TableHead>
+                    <TableHead 
+                      className="cursor-pointer hover:bg-muted/50"
+                      onClick={() => handleSort("points_from_ft_percentage")}
+                    >
+                      FT% {getSortIndicator("points_from_ft_percentage")}
+                    </TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
                   {playerPoints?.map((player) => (
                     <TableRow key={`${player.player_name}-${player.team_code}`}>
-                      <TableCell>{player.player_name}</TableCell>
+                      <TableCell className="font-medium">{player.player_name}</TableCell>
                       <TableCell>{player.team_code}</TableCell>
                       <TableCell>{player.games_played}</TableCell>
-                      <TableCell>{player.games_started}</TableCell>
-                      <TableCell>{formatPercentage(player.two_point_attempts_share)}</TableCell>
-                      <TableCell>{formatPercentage(player.three_point_attempts_share)}</TableCell>
-                      <TableCell>{formatPercentage(player.free_throw_attempts_share)}</TableCell>
-                      <TableCell>{formatPercentage(player.two_points_made_share)}</TableCell>
-                      <TableCell>{formatPercentage(player.three_points_made_share)}</TableCell>
-                      <TableCell>{formatPercentage(player.free_throws_made_share)}</TableCell>
                       <TableCell>{formatPercentage(player.points_from_two_percentage)}</TableCell>
                       <TableCell>{formatPercentage(player.points_from_three_percentage)}</TableCell>
                       <TableCell>{formatPercentage(player.points_from_ft_percentage)}</TableCell>
@@ -194,6 +147,50 @@ const PlayerPointsStats = () => {
                   ))}
                 </TableBody>
               </Table>
+            </div>
+
+            <div className="mt-4">
+              <Pagination>
+                <PaginationContent>
+                  <PaginationItem>
+                    <PaginationPrevious 
+                      onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
+                      disabled={currentPage === 1}
+                    />
+                  </PaginationItem>
+                  
+                  {Array.from({ length: totalPages }, (_, i) => i + 1)
+                    .filter(page => 
+                      page === 1 || 
+                      page === totalPages || 
+                      Math.abs(currentPage - page) <= 2
+                    )
+                    .map((page, index, array) => (
+                      <React.Fragment key={page}>
+                        {index > 0 && array[index - 1] !== page - 1 && (
+                          <PaginationItem>
+                            <PaginationLink disabled>...</PaginationLink>
+                          </PaginationItem>
+                        )}
+                        <PaginationItem>
+                          <PaginationLink
+                            onClick={() => setCurrentPage(page)}
+                            isActive={currentPage === page}
+                          >
+                            {page}
+                          </PaginationLink>
+                        </PaginationItem>
+                      </React.Fragment>
+                    ))}
+                  
+                  <PaginationItem>
+                    <PaginationNext 
+                      onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
+                      disabled={currentPage === totalPages}
+                    />
+                  </PaginationItem>
+                </PaginationContent>
+              </Pagination>
             </div>
           </CardContent>
         </Card>
