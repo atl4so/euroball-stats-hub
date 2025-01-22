@@ -11,8 +11,18 @@ import {
 import { Card } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { useState } from "react";
+import { ArrowUpDown } from "lucide-react";
+import { Button } from "@/components/ui/button";
+
+type SortConfig = {
+  key: string;
+  direction: 'asc' | 'desc';
+};
 
 const TeamStats = () => {
+  const [sortConfig, setSortConfig] = useState<SortConfig>({ key: 'points', direction: 'desc' });
+
   const { data: stats, isLoading, error } = useQuery({
     queryKey: ["teamStats"],
     queryFn: async () => {
@@ -25,6 +35,23 @@ const TeamStats = () => {
       return data;
     },
   });
+
+  const handleSort = (key: string) => {
+    setSortConfig((current) => ({
+      key,
+      direction: current.key === key && current.direction === 'asc' ? 'desc' : 'asc',
+    }));
+  };
+
+  const sortedStats = stats ? [...stats].sort((a, b) => {
+    const aValue = a[sortConfig.key as keyof typeof a];
+    const bValue = b[sortConfig.key as keyof typeof b];
+    
+    if (typeof aValue === 'number' && typeof bValue === 'number') {
+      return sortConfig.direction === 'asc' ? aValue - bValue : bValue - aValue;
+    }
+    return 0;
+  }) : [];
 
   if (isLoading) {
     return (
@@ -47,31 +74,42 @@ const TeamStats = () => {
     );
   }
 
+  const SortableHeader = ({ label, field }: { label: string; field: string }) => (
+    <Button
+      variant="ghost"
+      onClick={() => handleSort(field)}
+      className="h-8 flex items-center gap-1"
+    >
+      {label}
+      <ArrowUpDown className="h-4 w-4" />
+    </Button>
+  );
+
   return (
     <div className="container mx-auto p-4 space-y-4">
       <h1 className="text-2xl font-bold">Team Statistics</h1>
       <Card>
-        <ScrollArea className="h-[600px] rounded-md">
-          <div className="w-full overflow-x-scroll">
-            <div className="min-w-[1000px]">
+        <ScrollArea className="h-[600px]">
+          <div className="overflow-x-auto">
+            <div style={{ minWidth: "1000px" }}>
               <Table>
                 <TableHeader>
                   <TableRow>
-                    <TableHead>Team</TableHead>
-                    <TableHead className="text-right">Games</TableHead>
-                    <TableHead className="text-right">Points</TableHead>
-                    <TableHead className="text-right">2PT%</TableHead>
-                    <TableHead className="text-right">3PT%</TableHead>
-                    <TableHead className="text-right">FT%</TableHead>
-                    <TableHead className="text-right">Rebounds</TableHead>
-                    <TableHead className="text-right">Assists</TableHead>
-                    <TableHead className="text-right">Steals</TableHead>
-                    <TableHead className="text-right">Blocks</TableHead>
-                    <TableHead className="text-right">PIR</TableHead>
+                    <TableHead><SortableHeader label="Team" field="team_code" /></TableHead>
+                    <TableHead className="text-right"><SortableHeader label="Games" field="games_played" /></TableHead>
+                    <TableHead className="text-right"><SortableHeader label="Points" field="points" /></TableHead>
+                    <TableHead className="text-right"><SortableHeader label="2PT%" field="two_points_percentage" /></TableHead>
+                    <TableHead className="text-right"><SortableHeader label="3PT%" field="three_points_percentage" /></TableHead>
+                    <TableHead className="text-right"><SortableHeader label="FT%" field="free_throws_percentage" /></TableHead>
+                    <TableHead className="text-right"><SortableHeader label="Rebounds" field="total_rebounds" /></TableHead>
+                    <TableHead className="text-right"><SortableHeader label="Assists" field="assists" /></TableHead>
+                    <TableHead className="text-right"><SortableHeader label="Steals" field="steals" /></TableHead>
+                    <TableHead className="text-right"><SortableHeader label="Blocks" field="blocks" /></TableHead>
+                    <TableHead className="text-right"><SortableHeader label="PIR" field="pir" /></TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {stats?.map((stat) => (
+                  {sortedStats?.map((stat) => (
                     <TableRow key={stat.id}>
                       <TableCell className="font-medium">{stat.team_code}</TableCell>
                       <TableCell className="text-right">{stat.games_played}</TableCell>
