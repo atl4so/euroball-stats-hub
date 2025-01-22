@@ -80,7 +80,7 @@ const PlayerStats = () => {
               <TableHeader>
                 <TableRow>
                   <TableHead 
-                    className="cursor-pointer"
+                    className="cursor-pointer sticky left-0 bg-background"
                     onClick={() => handleSort("player_name")}
                   >
                     Player
@@ -99,6 +99,12 @@ const PlayerStats = () => {
                   </TableHead>
                   <TableHead 
                     className="cursor-pointer text-right"
+                    onClick={() => handleSort("games_started")}
+                  >
+                    GS
+                  </TableHead>
+                  <TableHead 
+                    className="cursor-pointer text-right"
                     onClick={() => handleSort("minutes")}
                   >
                     MIN
@@ -111,9 +117,33 @@ const PlayerStats = () => {
                   </TableHead>
                   <TableHead 
                     className="cursor-pointer text-right"
+                    onClick={() => handleSort("two_points_made")}
+                  >
+                    2PM
+                  </TableHead>
+                  <TableHead 
+                    className="cursor-pointer text-right"
+                    onClick={() => handleSort("two_points_attempted")}
+                  >
+                    2PA
+                  </TableHead>
+                  <TableHead 
+                    className="cursor-pointer text-right"
                     onClick={() => handleSort("two_points_percentage")}
                   >
                     2P%
+                  </TableHead>
+                  <TableHead 
+                    className="cursor-pointer text-right"
+                    onClick={() => handleSort("three_points_made")}
+                  >
+                    3PM
+                  </TableHead>
+                  <TableHead 
+                    className="cursor-pointer text-right"
+                    onClick={() => handleSort("three_points_attempted")}
+                  >
+                    3PA
                   </TableHead>
                   <TableHead 
                     className="cursor-pointer text-right"
@@ -123,9 +153,33 @@ const PlayerStats = () => {
                   </TableHead>
                   <TableHead 
                     className="cursor-pointer text-right"
+                    onClick={() => handleSort("free_throws_made")}
+                  >
+                    FTM
+                  </TableHead>
+                  <TableHead 
+                    className="cursor-pointer text-right"
+                    onClick={() => handleSort("free_throws_attempted")}
+                  >
+                    FTA
+                  </TableHead>
+                  <TableHead 
+                    className="cursor-pointer text-right"
                     onClick={() => handleSort("free_throws_percentage")}
                   >
                     FT%
+                  </TableHead>
+                  <TableHead 
+                    className="cursor-pointer text-right"
+                    onClick={() => handleSort("offensive_rebounds")}
+                  >
+                    OREB
+                  </TableHead>
+                  <TableHead 
+                    className="cursor-pointer text-right"
+                    onClick={() => handleSort("defensive_rebounds")}
+                  >
+                    DREB
                   </TableHead>
                   <TableHead 
                     className="cursor-pointer text-right"
@@ -147,15 +201,33 @@ const PlayerStats = () => {
                   </TableHead>
                   <TableHead 
                     className="cursor-pointer text-right"
+                    onClick={() => handleSort("turnovers")}
+                  >
+                    TOV
+                  </TableHead>
+                  <TableHead 
+                    className="cursor-pointer text-right"
                     onClick={() => handleSort("blocks")}
                   >
                     BLK
                   </TableHead>
                   <TableHead 
                     className="cursor-pointer text-right"
-                    onClick={() => handleSort("turnovers")}
+                    onClick={() => handleSort("blocks_against")}
                   >
-                    TOV
+                    BLKA
+                  </TableHead>
+                  <TableHead 
+                    className="cursor-pointer text-right"
+                    onClick={() => handleSort("fouls_committed")}
+                  >
+                    PF
+                  </TableHead>
+                  <TableHead 
+                    className="cursor-pointer text-right"
+                    onClick={() => handleSort("fouls_drawn")}
+                  >
+                    FD
                   </TableHead>
                   <TableHead 
                     className="cursor-pointer text-right"
@@ -168,21 +240,33 @@ const PlayerStats = () => {
               <TableBody>
                 {paginatedStats?.map((stat) => (
                   <TableRow key={`${stat.player_name}-${stat.team_code}`}>
-                    <TableCell className="font-medium">
+                    <TableCell className="font-medium sticky left-0 bg-background">
                       {stat.player_name}
                     </TableCell>
                     <TableCell>{stat.team_code}</TableCell>
                     <TableCell className="text-right">{stat.games_played}</TableCell>
+                    <TableCell className="text-right">{stat.games_started}</TableCell>
                     <TableCell className="text-right">{formatNumber(stat.minutes)}</TableCell>
                     <TableCell className="text-right">{formatNumber(stat.points)}</TableCell>
+                    <TableCell className="text-right">{stat.two_points_made}</TableCell>
+                    <TableCell className="text-right">{stat.two_points_attempted}</TableCell>
                     <TableCell className="text-right">{formatPercentage(stat.two_points_percentage)}</TableCell>
+                    <TableCell className="text-right">{stat.three_points_made}</TableCell>
+                    <TableCell className="text-right">{stat.three_points_attempted}</TableCell>
                     <TableCell className="text-right">{formatPercentage(stat.three_points_percentage)}</TableCell>
+                    <TableCell className="text-right">{stat.free_throws_made}</TableCell>
+                    <TableCell className="text-right">{stat.free_throws_attempted}</TableCell>
                     <TableCell className="text-right">{formatPercentage(stat.free_throws_percentage)}</TableCell>
+                    <TableCell className="text-right">{stat.offensive_rebounds}</TableCell>
+                    <TableCell className="text-right">{stat.defensive_rebounds}</TableCell>
                     <TableCell className="text-right">{stat.rebounds}</TableCell>
                     <TableCell className="text-right">{stat.assists}</TableCell>
                     <TableCell className="text-right">{stat.steals}</TableCell>
-                    <TableCell className="text-right">{stat.blocks}</TableCell>
                     <TableCell className="text-right">{stat.turnovers}</TableCell>
+                    <TableCell className="text-right">{stat.blocks}</TableCell>
+                    <TableCell className="text-right">{stat.blocks_against}</TableCell>
+                    <TableCell className="text-right">{stat.fouls_committed}</TableCell>
+                    <TableCell className="text-right">{stat.fouls_drawn}</TableCell>
                     <TableCell className="text-right">{stat.pir}</TableCell>
                   </TableRow>
                 ))}
