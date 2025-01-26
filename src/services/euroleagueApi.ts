@@ -1,19 +1,26 @@
 import { ResultsResponse, ScheduleResponse, PlayerDetails, GameDetails, TeamStats } from "@/types/euroleague";
+import { xmlToJson } from "@/utils/xmlParser";
 import { TeamsResponse } from "@/types/team";
 import { type BasicStandingsResponse } from "@/types/basicStandings";
 
-const EDGE_FUNCTION_URL = "https://lbywaojahxkvkpjdufwc.supabase.co/functions/v1/euroleague-proxy";
+const BASE_URL = "https://api-live.euroleague.net/v1";
+const BASE_URL_V3 = "https://api-live.euroleague.net/v3";
 
 const defaultHeaders = {
   "Accept": "application/json",
   "Content-Type": "application/json",
+  "Origin": "https://www.euroleague.net",
+  "Referer": "https://www.euroleague.net/",
+};
+
+const API_HEADERS = {
+  ...defaultHeaders,
 };
 
 export const fetchResults = async (seasonCode: string, gameNumber: number): Promise<ResultsResponse> => {
   try {
     const response = await fetch(
-      `${EDGE_FUNCTION_URL}/results?seasonCode=${seasonCode}&gameNumber=${gameNumber}`,
-      { headers: defaultHeaders }
+      `${BASE_URL}/results?seasonCode=${seasonCode}&gameNumber=${gameNumber}`
     );
     
     if (!response.ok) {
@@ -51,8 +58,7 @@ export const fetchResults = async (seasonCode: string, gameNumber: number): Prom
 export const fetchSchedule = async (seasonCode: string, gameNumber: number): Promise<ScheduleResponse> => {
   try {
     const response = await fetch(
-      `${EDGE_FUNCTION_URL}/schedules?seasonCode=${seasonCode}&gameNumber=${gameNumber}`,
-      { headers: defaultHeaders }
+      `${BASE_URL}/schedules?seasonCode=${seasonCode}&gameNumber=${gameNumber}`
     );
     
     if (!response.ok) {
@@ -96,7 +102,7 @@ export const fetchSchedule = async (seasonCode: string, gameNumber: number): Pro
 export const fetchGameDetails = async (gameCode: number, seasonCode: string): Promise<GameDetails> => {
   try {
     const response = await fetch(
-      `${EDGE_FUNCTION_URL}/games?seasonCode=${seasonCode}&gameCode=${gameCode}`
+      `${BASE_URL}/games?seasonCode=${seasonCode}&gameCode=${gameCode}`
     );
     
     if (!response.ok) {
@@ -189,7 +195,7 @@ export const fetchGameDetails = async (gameCode: number, seasonCode: string): Pr
 export const fetchPlayerDetails = async (playerCode: string, seasonCode: string): Promise<PlayerDetails> => {
   try {
     const response = await fetch(
-      `${EDGE_FUNCTION_URL}/players?playerCode=${playerCode}&seasonCode=${seasonCode}`
+      `${BASE_URL}/players?playerCode=${playerCode}&seasonCode=${seasonCode}`
     );
     
     if (!response.ok) {
@@ -244,12 +250,14 @@ export const fetchPlayerDetails = async (playerCode: string, seasonCode: string)
 export const fetchTeams = async (seasonCode: string): Promise<TeamsResponse> => {
   try {
     const response = await fetch(
-      `${EDGE_FUNCTION_URL}/teams?seasonCode=${seasonCode}`,
+      `${BASE_URL}/teams?seasonCode=${seasonCode}`,
       {
         method: "GET",
         headers: {
           "Accept": "application/xml",
           "Content-Type": "application/xml",
+          "Origin": "https://www.euroleague.net",
+          "Referer": "https://www.euroleague.net/",
         },
       }
     );
@@ -361,9 +369,9 @@ export const fetchTeams = async (seasonCode: string): Promise<TeamsResponse> => 
 
 export const fetchBasicStandings = async (roundNumber: string = "22"): Promise<BasicStandingsResponse> => {
   const response = await fetch(
-    `${EDGE_FUNCTION_URL}/competitions/euroleague/seasons/e2024/rounds/${roundNumber}/basicstandings`,
+    `${BASE_URL_V3}/competitions/euroleague/seasons/e2024/rounds/${roundNumber}/basicstandings`,
     {
-      headers: defaultHeaders,
+      headers: API_HEADERS,
     }
   );
 
@@ -411,7 +419,7 @@ export const fetchStandings = async (seasonCode: string = "E2024", gameNumber: n
   });
 
   const response = await fetch(
-    `${EDGE_FUNCTION_URL}/standings?${params}`,
+    `https://api-live.euroleague.net/v1/standings?${params}`,
     {
       headers: {
         "Accept": "application/xml",
@@ -487,9 +495,9 @@ export interface ClubV3Response {
 
 export const fetchClubV3 = async (clubCode: string): Promise<ClubV3Response> => {
   const response = await fetch(
-    `${EDGE_FUNCTION_URL}/clubs/${clubCode}`,
+    `${BASE_URL_V3}/clubs/${clubCode}`,
     {
-      headers: defaultHeaders,
+      headers: API_HEADERS,
     }
   );
 
