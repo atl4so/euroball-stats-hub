@@ -1,5 +1,5 @@
 import { Link, useLocation } from "react-router-dom";
-import { Trophy, Calendar, Users, BarChart3 } from "lucide-react";
+import { Calendar, Users, BarChart3 } from "lucide-react";
 import {
   Sidebar,
   SidebarContent,
@@ -34,7 +34,7 @@ export function AppSidebar() {
   const location = useLocation();
 
   return (
-    <Sidebar>
+    <Sidebar className="z-50">
       <div className="p-4">
         <Logo />
       </div>
@@ -47,6 +47,7 @@ export function AppSidebar() {
                   <SidebarMenuButton
                     asChild
                     className={cn(
+                      "w-full",
                       location.pathname === item.url && "bg-accent text-accent-foreground"
                     )}
                   >

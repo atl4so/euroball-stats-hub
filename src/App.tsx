@@ -20,7 +20,7 @@ function App() {
         <SidebarProvider>
           <div className="min-h-screen flex w-full">
             <AppSidebar />
-            <main className="flex-1 overflow-x-hidden">
+            <main className="flex-1 overflow-x-hidden p-4 md:p-6">
               <Routes>
                 <Route path="/" element={<Index />} />
                 <Route path="/game/:gameCode" element={<GameDetails />} />
