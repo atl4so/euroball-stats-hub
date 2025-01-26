@@ -74,3 +74,20 @@
 .winner {
   @apply text-primary;
 }
+
+/* New styles for navigation */
+.nav-link {
+  @apply relative flex items-center gap-2 px-3 py-2 text-sm font-medium transition-colors;
+}
+
+.nav-link::after {
+  @apply absolute bottom-0 left-0 h-0.5 w-full scale-x-0 bg-primary transition-transform duration-200 content-[''];
+}
+
+.nav-link.active::after {
+  @apply scale-x-100;
+}
+
+.nav-link:hover::after {
+  @apply scale-x-100;
+}
