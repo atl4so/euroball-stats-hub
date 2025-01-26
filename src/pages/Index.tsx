@@ -4,7 +4,7 @@ import { GameList } from "@/components/GameList";
 import { ScheduleList } from "@/components/ScheduleList";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { PageBreadcrumb } from "@/components/PageBreadcrumb";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useAuth } from "@/components/AuthProvider";
 import {
   DropdownMenu,
@@ -20,35 +20,56 @@ import { Link } from "react-router-dom";
 import { Card, CardContent } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
-const CURRENT_ROUND = 22; // Last completed round
-const NEXT_ROUND = CURRENT_ROUND + 1;
 const FINAL_ROUND = 34; // Total rounds in the season
 
 const Index = () => {
-  const [resultsRound, setResultsRound] = useState(CURRENT_ROUND);
-  const [scheduleRound, setScheduleRound] = useState(NEXT_ROUND);
+  const [resultsRound, setResultsRound] = useState<number | null>(null);
+  const [scheduleRound, setScheduleRound] = useState<number | null>(null);
   const { user } = useAuth();
+
+  // Query to find the latest round with completed games
+  const { data: latestRoundData, isLoading: isLoadingLatest } = useQuery({
+    queryKey: ["latest-round"],
+    queryFn: async () => {
+      // Start from the last round and work backwards
+      for (let round = FINAL_ROUND; round >= 1; round--) {
+        const roundData = await fetchResults("E2024", round);
+        if (roundData?.game?.some(game => game.played)) {
+          return round;
+        }
+      }
+      return 1; // Fallback to round 1 if no games are played
+    },
+  });
+
+  // Set initial rounds when latest round is determined
+  useEffect(() => {
+    if (latestRoundData && !resultsRound) {
+      setResultsRound(latestRoundData);
+      setScheduleRound(Math.min(latestRoundData + 1, FINAL_ROUND));
+    }
+  }, [latestRoundData, resultsRound]);
   
   const { data: resultsData, isLoading: isLoadingResults } = useQuery({
     queryKey: ["results", resultsRound],
-    queryFn: () => fetchResults("E2024", resultsRound),
-    enabled: resultsRound <= CURRENT_ROUND
+    queryFn: () => fetchResults("E2024", resultsRound || 1),
+    enabled: resultsRound !== null
   });
 
   const { data: scheduleData, isLoading: isLoadingSchedule } = useQuery({
     queryKey: ["schedule", scheduleRound],
-    queryFn: () => fetchSchedule("E2024", scheduleRound),
-    enabled: scheduleRound > CURRENT_ROUND && scheduleRound <= FINAL_ROUND
+    queryFn: () => fetchSchedule("E2024", scheduleRound || 1),
+    enabled: scheduleRound !== null
   });
 
   const handleResultsPageChange = (page: number) => {
-    if (page >= 1 && page <= CURRENT_ROUND) {
+    if (page >= 1 && page <= (latestRoundData || FINAL_ROUND)) {
       setResultsRound(page);
     }
   };
 
   const handleSchedulePageChange = (page: number) => {
-    if (page > CURRENT_ROUND && page <= FINAL_ROUND) {
+    if (page > (resultsRound || 1) && page <= FINAL_ROUND) {
       setScheduleRound(page);
     }
   };
@@ -56,6 +77,10 @@ const Index = () => {
   const breadcrumbItems = [
     { label: "Games", path: "/" },
   ];
+
+  if (isLoadingLatest) {
+    return <div className="container mx-auto px-4 py-8">Loading...</div>;
+  }
 
   return (
     <div>
@@ -122,16 +147,18 @@ const Index = () => {
               <TabsContent value="results" className="mt-0">
                 <div className="space-y-4">
                   <div className="flex justify-between items-center">
-                    <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100">Round {resultsRound}</h3>
+                    <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100">
+                      Round {resultsRound}
+                    </h3>
                     <Select
-                      value={resultsRound.toString()}
+                      value={resultsRound?.toString()}
                       onValueChange={(value) => handleResultsPageChange(parseInt(value, 10))}
                     >
                       <SelectTrigger className="w-[180px] border-gray-200 dark:border-gray-800">
                         <SelectValue placeholder="Select round" />
                       </SelectTrigger>
                       <SelectContent>
-                        {Array.from({ length: CURRENT_ROUND }, (_, i) => (
+                        {Array.from({ length: latestRoundData || 0 }, (_, i) => (
                           <SelectItem key={i + 1} value={(i + 1).toString()}>
                             Round {i + 1}
                           </SelectItem>
@@ -144,7 +171,7 @@ const Index = () => {
                       <GameList
                         games={resultsData?.game || []}
                         isLoading={isLoadingResults}
-                        currentRound={resultsRound}
+                        currentRound={resultsRound || 1}
                         onPageChange={handleResultsPageChange}
                       />
                     </CardContent>
@@ -155,21 +182,23 @@ const Index = () => {
               <TabsContent value="schedule" className="mt-0">
                 <div className="space-y-4">
                   <div className="flex justify-between items-center">
-                    <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100">Round {scheduleRound}</h3>
+                    <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100">
+                      Round {scheduleRound}
+                    </h3>
                     <Select
-                      value={scheduleRound.toString()}
+                      value={scheduleRound?.toString()}
                       onValueChange={(value) => handleSchedulePageChange(parseInt(value, 10))}
                     >
                       <SelectTrigger className="w-[180px] border-gray-200 dark:border-gray-800">
                         <SelectValue placeholder="Select round" />
                       </SelectTrigger>
                       <SelectContent>
-                        {Array.from({ length: FINAL_ROUND - CURRENT_ROUND }, (_, i) => (
+                        {Array.from({ length: FINAL_ROUND - (latestRoundData || 0) }, (_, i) => (
                           <SelectItem
-                            key={i + NEXT_ROUND}
-                            value={(i + NEXT_ROUND).toString()}
+                            key={i + (latestRoundData || 0) + 1}
+                            value={(i + (latestRoundData || 0) + 1).toString()}
                           >
-                            Round {i + NEXT_ROUND}
+                            Round {i + (latestRoundData || 0) + 1}
                           </SelectItem>
                         ))}
                       </SelectContent>
@@ -180,7 +209,7 @@ const Index = () => {
                       <ScheduleList
                         schedules={scheduleData?.item || []}
                         isLoading={isLoadingSchedule}
-                        currentRound={scheduleRound}
+                        currentRound={scheduleRound || 1}
                         onPageChange={handleSchedulePageChange}
                       />
                     </CardContent>
