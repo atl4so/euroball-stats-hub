@@ -21,10 +21,11 @@ export function DesktopNav() {
               <NavigationMenuLink
                 className={cn(
                   navigationMenuTriggerStyle(),
+                  "flex items-center gap-2",
                   location.pathname === item.url && "bg-accent text-accent-foreground"
                 )}
               >
-                <item.icon className="mr-2 h-4 w-4" />
+                <item.icon className="h-4 w-4" />
                 {item.title}
               </NavigationMenuLink>
             </Link>
