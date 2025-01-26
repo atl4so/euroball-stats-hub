@@ -1,11 +1,11 @@
 import { useQuery } from "@tanstack/react-query";
 import { useParams, Link } from "react-router-dom";
 import { fetchTeams } from "@/services/euroleagueApi";
-import { Loader2, MapPin, Users, Trophy } from "lucide-react";
+import { Loader2, MapPin } from "lucide-react";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { TeamsResponse, Team } from "@/types/team";
-import { PageBreadcrumb } from "@/components/PageBreadcrumb";
+import { TeamsResponse } from "@/types/team";
+import { BackButton } from "@/components/BackButton";
 
 const TeamDetails = () => {
   const { teamCode } = useParams();
@@ -44,16 +44,10 @@ const TeamDetails = () => {
     );
   }
 
-  const breadcrumbItems = [
-    { label: "Teams", path: "/teams" },
-    { label: team.name, path: `/team/${teamCode}` },
-  ];
-
   return (
     <div className="min-h-screen bg-background">
-      <PageBreadcrumb items={breadcrumbItems} />
-      
       <div className="container mx-auto px-3 sm:px-4 py-4 sm:py-6 space-y-4 sm:space-y-6 max-w-7xl">
+        <BackButton />
         <div className="mb-6">
           <h1 className="text-3xl font-bold text-gray-900 dark:text-gray-100">{team.name}</h1>
           <p className="text-gray-500 dark:text-gray-400 flex items-center gap-2 mt-2">

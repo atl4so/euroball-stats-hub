@@ -3,7 +3,6 @@ import { fetchResults, fetchSchedule } from "@/services/euroleagueApi";
 import { GameList } from "@/components/GameList";
 import { ScheduleList } from "@/components/ScheduleList";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { PageBreadcrumb } from "@/components/PageBreadcrumb";
 import { useState, useEffect } from "react";
 import { useAuth } from "@/components/AuthProvider";
 import {
@@ -74,18 +73,8 @@ const Index = () => {
     }
   };
 
-  const breadcrumbItems = [
-    { label: "Games", path: "/" },
-  ];
-
-  if (isLoadingLatest) {
-    return <div className="container mx-auto px-4 py-8">Loading...</div>;
-  }
-
   return (
     <div>
-      <PageBreadcrumb items={breadcrumbItems} />
-      
       <div className="container mx-auto px-3 sm:px-4 py-4 sm:py-6 max-w-7xl">
         <div className="mb-6">
           <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-gray-100">Euroleague 2024-25</h1>

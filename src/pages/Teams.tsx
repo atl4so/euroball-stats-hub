@@ -1,9 +1,9 @@
 import { useQuery, useQueries } from "@tanstack/react-query";
 import { fetchTeams, fetchClubV3 } from "@/services/euroleagueApi";
 import { TeamCard } from "@/components/team/TeamCard";
-import { PageBreadcrumb } from "@/components/PageBreadcrumb";
 import { TeamsResponse } from "@/types/team";
 import { Card, CardContent } from "@/components/ui/card";
+import { BackButton } from "@/components/BackButton";
 
 const Teams = () => {
   const { data: teams, isLoading, error } = useQuery<TeamsResponse>({
@@ -23,19 +23,14 @@ const Teams = () => {
     return clubQueries.find((q) => q.data?.code === code)?.data;
   };
 
-  const breadcrumbItems = [
-    { label: "Teams", path: "/teams" },
-  ];
-
   if (isLoading || clubQueries.some((q) => q.isLoading)) return <div className="p-4">Loading...</div>;
   if (error) return <div className="p-4">Error loading teams</div>;
   if (!teams) return <div className="p-4">No teams data available</div>;
 
   return (
     <div>
-      <PageBreadcrumb items={breadcrumbItems} />
-      
       <div className="container mx-auto px-4 py-6">
+        <BackButton />
         <div className="mb-6">
           <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100">Teams</h1>
           <p className="text-sm text-gray-500 dark:text-gray-400">View all Euroleague teams</p>
