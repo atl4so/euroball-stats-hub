@@ -129,39 +129,41 @@ export const GameList = ({ games, isLoading, currentRound, onPageChange }: GameL
       })}
 
       {games.length > 0 && (
-        <Pagination className="py-4">
-          <PaginationContent>
-            <PaginationItem>
-              <PaginationPrevious
-                onClick={() => onPageChange(currentRound - 1)}
-                className="cursor-pointer"
-              />
-            </PaginationItem>
-
-            {Array.from({ length: 3 }, (_, i) => currentRound - 1 + i).map((round) => (
-              <PaginationItem key={round}>
-                <PaginationLink
-                  onClick={() => onPageChange(round)}
-                  isActive={round === currentRound}
+        <div className="px-4 py-3 border-t border-gray-200 dark:border-gray-800">
+          <Pagination>
+            <PaginationContent>
+              <PaginationItem>
+                <PaginationPrevious
+                  onClick={() => onPageChange(currentRound - 1)}
                   className="cursor-pointer"
-                >
-                  {round}
-                </PaginationLink>
+                />
               </PaginationItem>
-            ))}
 
-            <PaginationItem>
-              <PaginationEllipsis />
-            </PaginationItem>
+              {Array.from({ length: 3 }, (_, i) => currentRound - 1 + i).map((round) => (
+                <PaginationItem key={round}>
+                  <PaginationLink
+                    onClick={() => onPageChange(round)}
+                    isActive={round === currentRound}
+                    className="cursor-pointer"
+                  >
+                    {round}
+                  </PaginationLink>
+                </PaginationItem>
+              ))}
 
-            <PaginationItem>
-              <PaginationNext
-                onClick={() => onPageChange(currentRound + 1)}
-                className="cursor-pointer"
-              />
-            </PaginationItem>
-          </PaginationContent>
-        </Pagination>
+              <PaginationItem>
+                <PaginationEllipsis />
+              </PaginationItem>
+
+              <PaginationItem>
+                <PaginationNext
+                  onClick={() => onPageChange(currentRound + 1)}
+                  className="cursor-pointer"
+                />
+              </PaginationItem>
+            </PaginationContent>
+          </Pagination>
+        </div>
       )}
     </motion.div>
   );
