@@ -33,10 +33,10 @@ euroleague.day provides real-time access to EuroLeague basketball data, includin
 
 ```bash
 # Clone the repository
-git clone <repository-url>
+git clone https://github.com/atl4so/euroball-stats-hub.git
 
 # Navigate to project directory
-cd euroleague.day
+cd euroball-stats-hub
 
 # Install dependencies
 npm install
