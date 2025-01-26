@@ -4,7 +4,6 @@ import { fetchGameDetails } from "@/services/euroleagueApi";
 import { GameHeader } from "@/components/game/GameHeader";
 import { GameScore } from "@/components/game/GameScore";
 import { GameLocation } from "@/components/game/GameLocation";
-import { GameStatus } from "@/components/game/GameStatus";
 import { QuarterScores } from "@/components/game/QuarterScores";
 import { TeamStats } from "@/components/game/TeamStats";
 import { useEffect } from "react";
@@ -43,7 +42,7 @@ const GameDetails = () => {
         date={gameDetails.cetdate}
       />
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
         <GameScore
           game={{
             gamecode: gameCode || "",
@@ -68,12 +67,6 @@ const GameDetails = () => {
         <GameLocation
           stadiumname={gameDetails.stadiumname}
           attendance={gameDetails.audience.toString()}
-        />
-
-        <GameStatus
-          played={gameDetails.played}
-          date={gameDetails.cetdate}
-          time={gameDetails.time}
         />
       </div>
 
