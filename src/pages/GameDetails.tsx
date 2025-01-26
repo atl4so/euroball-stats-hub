@@ -8,6 +8,7 @@ import { GameStatus } from "@/components/game/GameStatus";
 import { QuarterScores } from "@/components/game/QuarterScores";
 import { TeamStats } from "@/components/game/TeamStats";
 import { useEffect } from "react";
+import { BackButton } from "@/components/BackButton";
 
 const GameDetails = () => {
   const { gameCode } = useParams();
@@ -34,6 +35,8 @@ const GameDetails = () => {
 
   return (
     <div className="container mx-auto px-3 sm:px-4 py-4 sm:py-6 space-y-4 sm:space-y-6 max-w-7xl">
+      <BackButton />
+      
       <GameHeader
         localTeam={gameDetails.localclub.name}
         roadTeam={gameDetails.roadclub.name}

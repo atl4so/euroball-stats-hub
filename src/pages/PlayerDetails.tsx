@@ -4,7 +4,7 @@ import { fetchPlayerDetails } from "@/services/euroleagueApi";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { format } from "date-fns";
 import { useEffect } from "react";
-import { PageBreadcrumb } from "@/components/PageBreadcrumb";
+import { BackButton } from "@/components/BackButton";
 
 const PlayerDetails = () => {
   const { playerCode } = useParams();
@@ -36,33 +36,26 @@ const PlayerDetails = () => {
     return totalMinutes.toFixed(1);
   };
 
-  const breadcrumbItems = [
-    { label: "Teams", path: "/teams" },
-    { label: playerDetails.clubName, path: `/team/${playerDetails.clubCode}` },
-    { label: playerDetails.name, path: `/player/${playerCode}` },
-  ];
-
   return (
-    <div>
-      <PageBreadcrumb items={breadcrumbItems} />
+    <div className="container mx-auto px-4 py-6 space-y-6 max-w-7xl">
+      <BackButton />
       
-      <div className="container mx-auto px-4 py-6 space-y-6 max-w-7xl">
-        <div className="space-y-4">
-          <h1 className="text-3xl font-bold tracking-tight text-gray-900 dark:text-gray-100">
-            {playerDetails.name}
-          </h1>
-          <div className="flex flex-wrap gap-2">
-            <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200">
-              {playerDetails.clubName}
-            </span>
-            <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200">
-              #{playerDetails.dorsal}
-            </span>
-            <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-emerald-100 text-emerald-800 dark:bg-emerald-900 dark:text-emerald-200">
-              {playerDetails.position}
-            </span>
-          </div>
+      <div className="space-y-4">
+        <h1 className="text-3xl font-bold tracking-tight text-gray-900 dark:text-gray-100">
+          {playerDetails.name}
+        </h1>
+        <div className="flex flex-wrap gap-2">
+          <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200">
+            {playerDetails.clubName}
+          </span>
+          <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200">
+            #{playerDetails.dorsal}
+          </span>
+          <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-emerald-100 text-emerald-800 dark:bg-emerald-900 dark:text-emerald-200">
+            {playerDetails.position}
+          </span>
         </div>
+      </div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           <Card className="bg-gradient-to-br from-blue-50 to-indigo-50 dark:from-blue-950 dark:to-indigo-950 border-0 shadow-lg">
@@ -197,7 +190,6 @@ const PlayerDetails = () => {
             </Card>
           )}
         </div>
-      </div>
     </div>
   );
 };
