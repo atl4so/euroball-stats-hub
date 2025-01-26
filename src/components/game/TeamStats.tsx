@@ -74,7 +74,9 @@ export const TeamStats = ({ team }: TeamStatsProps) => {
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-200 dark:divide-gray-700">
-              {team.playerstats.stat.map((player) => (
+              {team.playerstats.stat
+                .filter(player => player.PlayerName !== "Team") // Filter out the "Team" row
+                .map((player) => (
                 <tr 
                   key={player.PlayerCode}
                   className={cn(
