@@ -14,19 +14,14 @@ export const GameCard = ({ game }: GameCardProps) => {
   const isCompleted = game.status === "FINAL";
 
   const getGameTime = () => {
-    if (!game.dateTime) return "";
-    try {
-      const date = parseISO(game.dateTime);
-      return format(date, "HH:mm");
-    } catch {
-      return game.time || "";
-    }
+    if (!game.time) return "";
+    return game.time;
   };
 
   const getGameDate = () => {
-    if (!game.dateTime) return "";
+    if (!game.date) return "";
     try {
-      const date = parseISO(game.dateTime);
+      const date = new Date(game.date);
       return format(date, "MMM d, yyyy");
     } catch {
       return "";

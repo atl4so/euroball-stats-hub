@@ -3,6 +3,7 @@ export interface Game {
   gameday: number;
   date: string;
   time: string;
+  dateTime?: string; // Added this optional field
   gamenumber: number;
   gamecode: string;
   group: string;
