@@ -120,7 +120,7 @@ export const TeamStats = ({ team }: TeamStatsProps) => {
               ))}
               {/* Team totals row */}
               <tr className="bg-gray-100/50 dark:bg-gray-800/50 font-medium">
-                <td className="py-2 px-2 sm:px-4 text-sm font-medium text-gray-900 dark:text-gray-100">Team</td>
+                <td className="py-2 px-2 sm:px-4 text-sm font-medium text-gray-900 dark:text-gray-100">Team Totals</td>
                 <td className="text-center py-2 px-2 sm:px-4 text-sm text-gray-600 dark:text-gray-300 tabular-nums">-</td>
                 <td className="text-center py-2 px-2 sm:px-4 text-sm font-medium text-gray-900 dark:text-gray-100 tabular-nums">{teamTotals.Score}</td>
                 <td className="text-center py-2 px-2 sm:px-4 text-sm text-gray-600 dark:text-gray-300 tabular-nums">{`${teamTotals.FieldGoalsMade2}-${teamTotals.FieldGoalsAttempted2}`}</td>
