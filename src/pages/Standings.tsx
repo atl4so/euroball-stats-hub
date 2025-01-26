@@ -9,12 +9,12 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { PageBreadcrumb } from "@/components/PageBreadcrumb";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Link } from "react-router-dom";
 import { Team } from "@/types/team";
 import { useEffect } from "react";
 import { LastGamesIndicator } from "@/components/LastGamesIndicator";
+import { BackButton } from "@/components/BackButton";
 
 const getPositionStyle = (ranking: number) => {
   if (ranking <= 6) return "bg-blue-100 dark:bg-blue-900/50";
@@ -75,7 +75,7 @@ const Standings = () => {
   if (standingsLoading || teamsLoading || clubQueries.some((q) => q.isLoading)) {
     return (
       <div className="container mx-auto py-6">
-        <PageBreadcrumb items={breadcrumbItems} />
+        <BackButton />
         <Card>
           <CardHeader>
             <CardTitle>Standings</CardTitle>
@@ -93,9 +93,8 @@ const Standings = () => {
 
   return (
     <div>
-      <PageBreadcrumb items={breadcrumbItems} />
-      
       <div className="container mx-auto px-4 py-6">
+        <BackButton />
         <div className="mb-6">
           <h1 className="text-2xl font-bold">
             {standings.standings.group.name}

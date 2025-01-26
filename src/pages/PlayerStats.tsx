@@ -4,7 +4,6 @@ import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody } from "@/components/ui/table";
 import { Loader2 } from "lucide-react";
-import { PageBreadcrumb } from "@/components/PageBreadcrumb";
 import { Button } from "@/components/ui/button";
 import {
   Pagination,
@@ -13,6 +12,7 @@ import {
 } from "@/components/ui/pagination";
 import PlayerStatsHeader from "@/components/player-stats/PlayerStatsHeader";
 import PlayerStatsRow from "@/components/player-stats/PlayerStatsRow";
+import { BackButton } from "@/components/BackButton";
 
 const PlayerStats = () => {
   const [currentPage, setCurrentPage] = useState(1);
@@ -48,10 +48,6 @@ const PlayerStats = () => {
   );
   const totalPages = stats ? Math.ceil(stats.length / pageSize) : 0;
 
-  const breadcrumbItems = [
-    { label: "Stats", path: "/player-stats" },
-  ];
-
   if (isLoading) {
     return (
       <div className="flex items-center justify-center min-h-screen">
@@ -62,7 +58,7 @@ const PlayerStats = () => {
 
   return (
     <div className="container mx-auto px-4 py-6">
-      <PageBreadcrumb items={breadcrumbItems} />
+      <BackButton />
       <h1 className="text-2xl font-bold mb-6">Player Statistics</h1>
 
       <Card>

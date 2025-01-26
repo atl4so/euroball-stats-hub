@@ -4,7 +4,6 @@ import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody } from "@/components/ui/table";
 import { Loader2 } from "lucide-react";
-import { PageBreadcrumb } from "@/components/PageBreadcrumb";
 import { Button } from "@/components/ui/button";
 import {
   Pagination,
@@ -12,6 +11,7 @@ import {
   PaginationItem,
 } from "@/components/ui/pagination";
 import { Alert, AlertDescription } from "@/components/ui/alert";
+import { BackButton } from "@/components/BackButton";
 
 const PlayerPointsStats = () => {
   const [currentPage, setCurrentPage] = useState(1);
@@ -91,7 +91,7 @@ const PlayerPointsStats = () => {
 
   return (
     <div className="container mx-auto px-4 py-6">
-      <PageBreadcrumb items={breadcrumbItems} />
+      <BackButton />
       <h1 className="text-2xl font-bold mb-6">Player Points Statistics</h1>
 
       <Card>
