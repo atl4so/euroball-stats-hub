@@ -2,32 +2,23 @@ import { ResultsResponse, ScheduleResponse, PlayerDetails, GameDetails, TeamStat
 import { xmlToJson } from "@/utils/xmlParser";
 import { TeamsResponse } from "@/types/team";
 import { type BasicStandingsResponse } from "@/types/basicStandings";
+import { supabase } from "@/integrations/supabase/client";
 
 const BASE_URL = "https://api-live.euroleague.net/v1";
 const BASE_URL_V3 = "https://api-live.euroleague.net/v3";
 
-const defaultHeaders = {
-  "Accept": "application/json",
-  "Content-Type": "application/json",
-  "Origin": "https://www.euroleague.net",
-  "Referer": "https://www.euroleague.net/",
-};
-
-const API_HEADERS = {
-  ...defaultHeaders,
-};
-
 export const fetchResults = async (seasonCode: string, gameNumber: number): Promise<ResultsResponse> => {
   try {
-    const response = await fetch(
-      `${BASE_URL}/results?seasonCode=${seasonCode}&gameNumber=${gameNumber}`
-    );
-    
-    if (!response.ok) {
-      throw new Error("Failed to fetch results");
+    const { data, error } = await supabase.functions.invoke('euroleague-proxy', {
+      body: {
+        path: `/results?seasonCode=${seasonCode}&gameNumber=${gameNumber}`
+      }
+    });
+
+    if (error) {
+      throw error;
     }
     
-    const data = await response.text();
     const parser = new DOMParser();
     const xmlDoc = parser.parseFromString(data, "text/xml");
     
@@ -45,7 +36,8 @@ export const fetchResults = async (seasonCode: string, gameNumber: number): Prom
       awayteam: game.getElementsByTagName("awayteam")[0]?.textContent || "",
       awaycode: game.getElementsByTagName("awaycode")[0]?.textContent || "",
       awayscore: game.getElementsByTagName("awayscore")[0]?.textContent || "0",
-      played: game.getElementsByTagName("played")[0]?.textContent === "true"
+      played: game.getElementsByTagName("played")[0]?.textContent === "true",
+      live: game.getElementsByTagName("live")[0]?.textContent || "0"
     }));
 
     return { game: games };
@@ -507,3 +499,4 @@ export const fetchClubV3 = async (clubCode: string): Promise<ClubV3Response> => 
 
   return response.json();
 };
+
