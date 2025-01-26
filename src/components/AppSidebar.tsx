@@ -10,6 +10,13 @@ import {
   SidebarMenuItem,
   SidebarTrigger,
 } from "@/components/ui/sidebar";
+import {
+  NavigationMenu,
+  NavigationMenuItem,
+  NavigationMenuLink,
+  NavigationMenuList,
+  navigationMenuTriggerStyle,
+} from "@/components/ui/navigation-menu";
 import { Logo } from "./Logo";
 import { cn } from "@/lib/utils";
 
@@ -36,16 +43,40 @@ export function AppSidebar() {
 
   return (
     <>
+      {/* Mobile Header */}
       <div className="fixed top-0 left-0 right-0 z-50 flex items-center gap-2 border-b bg-background p-4 lg:hidden">
         <SidebarTrigger>
           <Menu className="h-6 w-6" />
         </SidebarTrigger>
         <Logo />
       </div>
-      <Sidebar className="z-50" collapsible="offcanvas">
-        <div className="hidden p-4 lg:block">
-          <Logo />
-        </div>
+
+      {/* Desktop Header */}
+      <div className="fixed top-0 left-0 right-0 z-50 hidden h-16 items-center justify-between border-b bg-background px-6 lg:flex">
+        <Logo />
+        <NavigationMenu>
+          <NavigationMenuList>
+            {items.map((item) => (
+              <NavigationMenuItem key={item.title}>
+                <Link to={item.url}>
+                  <NavigationMenuLink
+                    className={cn(
+                      navigationMenuTriggerStyle(),
+                      location.pathname === item.url && "bg-accent text-accent-foreground"
+                    )}
+                  >
+                    <item.icon className="mr-2 h-4 w-4" />
+                    {item.title}
+                  </NavigationMenuLink>
+                </Link>
+              </NavigationMenuItem>
+            ))}
+          </NavigationMenuList>
+        </NavigationMenu>
+      </div>
+
+      {/* Mobile Sidebar */}
+      <Sidebar className="z-50 lg:hidden" collapsible="offcanvas">
         <SidebarContent>
           <SidebarGroup>
             <SidebarGroupContent>
