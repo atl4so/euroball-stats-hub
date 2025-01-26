@@ -1,3 +1,1 @@
 project_id = "lbywaojahxkvkpjdufwc"
-[functions.euroleague-proxy]
-verify_jwt = false
