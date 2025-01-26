@@ -6,6 +6,8 @@ import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { TeamsResponse } from "@/types/team";
 import { BackButton } from "@/components/BackButton";
+import { format } from "date-fns";
+import { cn } from "@/lib/utils";
 
 const TeamDetails = () => {
   const { teamCode } = useParams();
@@ -147,33 +149,42 @@ const TeamDetails = () => {
           <TabsContent value="games" className="space-y-4">
             <Card className="bg-gradient-to-br from-blue-50 to-indigo-50 dark:from-blue-950 dark:to-indigo-950 border-0 shadow-lg">
               <CardContent className="pt-6">
-                <div className="space-y-4">
+                <div className="space-y-2">
                   {team.games?.phase?.game?.map((game) => (
                     <Link
                       key={game.gamecode}
                       to={`/game/${game.gamecode}`}
-                      className="block p-4 rounded-lg bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors"
+                      className="block p-3 rounded-lg bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors"
                     >
-                      <div className="flex justify-between items-center">
-                        <div>
-                          <p className="font-medium text-gray-900 dark:text-gray-100">
+                      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2">
+                        <div className="flex-1 min-w-0">
+                          <p className="font-medium text-gray-900 dark:text-gray-100 truncate text-sm sm:text-base">
                             {game.versus}
                           </p>
-                          <p className="text-sm text-gray-500 dark:text-gray-400">
-                            {new Date(game.gamedate).toLocaleDateString()}
+                          <p className="text-xs text-gray-500 dark:text-gray-400">
+                            {format(new Date(game.gamedate), "dd/MM/yyyy")}
                           </p>
                         </div>
-                        <div className="text-right">
-                          <p className="font-medium text-gray-900 dark:text-gray-100">
-                            {game.played ? (
-                              `${game.standingslocalscore} - ${game.standingsroadscore}`
-                            ) : (
-                              "Upcoming"
-                            )}
-                          </p>
-                          <p className={`text-sm ${game.played ? (game.win === "1" ? "text-green-600 dark:text-green-400" : "text-red-600 dark:text-red-400") : "text-gray-500 dark:text-gray-400"}`}>
-                            {game.played ? (game.win === "1" ? "Win" : "Loss") : game.phase}
-                          </p>
+                        <div className="flex items-center gap-2 self-end sm:self-auto">
+                          <div className="text-right whitespace-nowrap">
+                            <p className="font-medium text-gray-900 dark:text-gray-100 text-sm sm:text-base tabular-nums">
+                              {game.played ? (
+                                `${game.standingslocalscore} - ${game.standingsroadscore}`
+                              ) : (
+                                "Upcoming"
+                              )}
+                            </p>
+                          </div>
+                          {game.played && (
+                            <div className={cn(
+                              "text-xs font-medium px-2 py-1 rounded",
+                              game.win === "1" 
+                                ? "bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400"
+                                : "bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400"
+                            )}>
+                              {game.win === "1" ? "Win" : "Loss"}
+                            </div>
+                          )}
                         </div>
                       </div>
                     </Link>
