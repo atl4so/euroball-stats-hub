@@ -1,69 +1,100 @@
-# Welcome to your Lovable project
+# euroleague.day 🏀
 
-## Project info
+A comprehensive web application for tracking EuroLeague basketball statistics, game schedules, and team performance metrics.
 
-**URL**: https://lovable.dev/projects/f5586c48-f702-4b89-ba01-a2831d010c1c
+## Overview
 
-## How can I edit this code?
+euroleague.day provides real-time access to EuroLeague basketball data, including:
 
-There are several ways of editing your application.
+- Live game scores and schedules
+- Detailed player statistics
+- Team performance analytics
+- Historical game data
+- Advanced basketball metrics
 
-**Use Lovable**
+## Tech Stack
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/f5586c48-f702-4b89-ba01-a2831d010c1c) and start prompting.
+- **Frontend**: React 18 with TypeScript
+- **UI Framework**: Tailwind CSS with shadcn/ui components
+- **State Management**: TanStack Query
+- **Routing**: React Router v6
+- **Data Visualization**: Recharts
+- **Backend**: Supabase
+- **Build Tool**: Vite
 
-Changes made via Lovable will be committed automatically to this repo.
+## Development
 
-**Use your preferred IDE**
+### Prerequisites
 
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
+- Node.js 18.x or higher
+- npm 9.x or higher
 
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
+### Local Development
 
-Follow these steps:
+```bash
+# Clone the repository
+git clone <repository-url>
 
-```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
+# Navigate to project directory
+cd euroleague.day
 
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
+# Install dependencies
+npm install
 
-# Step 3: Install the necessary dependencies.
-npm i
-
-# Step 4: Start the development server with auto-reloading and an instant preview.
+# Start development server
 npm run dev
 ```
 
-**Edit a file directly in GitHub**
+### Building for Production
 
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
+```bash
+# Create production build
+npm run build
 
-**Use GitHub Codespaces**
+# Preview production build
+npm run preview
+```
 
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
+## Architecture
 
-## What technologies are used for this project?
+The application follows a component-based architecture with:
 
-This project is built with .
+- Reusable UI components
+- Custom hooks for data fetching
+- Type-safe data management
+- Responsive design patterns
+- Real-time data updates
 
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
+## Features
 
-## How can I deploy this project?
+### Game Tracking
+- Live score updates
+- Play-by-play analysis
+- Game statistics visualization
 
-Simply open [Lovable](https://lovable.dev/projects/f5586c48-f702-4b89-ba01-a2831d010c1c) and click on Share -> Publish.
+### Team Management
+- Team roster information
+- Historical performance data
+- Head-to-head statistics
 
-## I want to use a custom domain - is that possible?
+### Player Statistics
+- Individual player metrics
+- Performance trends
+- Advanced statistical analysis
 
-We don't support custom domains (yet). If you want to deploy your project under your own domain then we recommend using Netlify. Visit our docs for more details: [Custom domains](https://docs.lovable.dev/tips-tricks/custom-domain/)
+## Contributing
+
+1. Fork the repository
+2. Create your feature branch (`git checkout -b feature/amazing-feature`)
+3. Commit your changes (`git commit -m 'Add some amazing feature'`)
+4. Push to the branch (`git push origin feature/amazing-feature`)
+5. Open a Pull Request
+
+## License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+## Acknowledgments
+
+- EuroLeague for providing the statistical data
+- The open-source community for the amazing tools and libraries
