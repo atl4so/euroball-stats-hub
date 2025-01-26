@@ -5,31 +5,43 @@ import { ScheduleList } from "@/components/ScheduleList";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useState, useEffect } from "react";
 import { useAuth } from "@/components/AuthProvider";
-import { Trophy } from "lucide-react";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { LogOut, User, Calendar, CheckCircle } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
+import { Button } from "@/components/ui/button";
+import { Link } from "react-router-dom";
 import { Card, CardContent } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { MainNavigation } from "@/components/MainNavigation";
 
-const FINAL_ROUND = 34;
+const FINAL_ROUND = 34; // Total rounds in the season
 
 const Index = () => {
   const [resultsRound, setResultsRound] = useState<number | null>(null);
   const [scheduleRound, setScheduleRound] = useState<number | null>(null);
   const { user } = useAuth();
 
+  // Query to find the latest round with completed games
   const { data: latestRoundData, isLoading: isLoadingLatest } = useQuery({
     queryKey: ["latest-round"],
     queryFn: async () => {
+      // Start from the last round and work backwards
       for (let round = FINAL_ROUND; round >= 1; round--) {
         const roundData = await fetchResults("E2024", round);
         if (roundData?.game?.some(game => game.played)) {
           return round;
         }
       }
-      return 1;
+      return 1; // Fallback to round 1 if no games are played
     },
   });
 
+  // Set initial rounds when latest round is determined
   useEffect(() => {
     if (latestRoundData && !resultsRound) {
       setResultsRound(latestRoundData);
@@ -62,33 +74,64 @@ const Index = () => {
   };
 
   return (
-    <div className="min-h-screen bg-background">
-      <MainNavigation />
-      
-      <main className="container mx-auto px-4 py-6 max-w-7xl">
-        <div className="space-y-6">
-          <div className="flex items-center gap-3">
-            <Trophy className="h-8 w-8 text-primary" />
-            <h1 className="text-3xl font-bold tracking-tight">Euroleague 2024-25</h1>
-          </div>
+    <div>
+      <div className="container mx-auto px-3 sm:px-4 py-4 sm:py-6 max-w-7xl">
+        <div className="mb-6">
+          <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-gray-100">Euroleague 2024-25</h1>
+        </div>
 
-          <Card className="bg-gradient-to-br from-blue-50 to-indigo-50 dark:from-blue-950 dark:to-indigo-950 border-0 shadow-lg overflow-hidden">
-            <CardContent className="p-6">
-              <div className="space-y-6">
-                <div>
-                  <h2 className="text-2xl font-semibold">Games Center</h2>
-                  <p className="text-muted-foreground">View all games and results</p>
-                </div>
+        <Card className="bg-gradient-to-br from-blue-50 to-indigo-50 dark:from-blue-950 dark:to-indigo-950 border-0 shadow-lg overflow-hidden">
+          <CardContent className="p-6">
+            <div className="flex justify-between items-center mb-6">
+              <div>
+                <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-100">Games Center</h2>
+                <p className="text-sm text-gray-500 dark:text-gray-400">View all games and results</p>
+              </div>
+              <div className="hidden">
+                {user ? (
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <Button variant="outline" size="icon" className="border-gray-200 dark:border-gray-800">
+                        <User className="h-4 w-4 text-gray-600 dark:text-gray-400" />
+                      </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="end" className="w-56">
+                      <DropdownMenuItem disabled className="text-sm text-gray-500 dark:text-gray-400">
+                        <User className="mr-2 h-4 w-4" />
+                        <span>{user.email}</span>
+                      </DropdownMenuItem>
+                      <DropdownMenuSeparator />
+                      <DropdownMenuItem onClick={() => supabase.auth.signOut()} className="text-red-600 dark:text-red-400">
+                        <LogOut className="mr-2 h-4 w-4" />
+                        <span>Log out</span>
+                      </DropdownMenuItem>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
+                ) : (
+                  <Button asChild variant="outline" className="border-gray-200 dark:border-gray-800">
+                    <Link to="/auth">Sign In</Link>
+                  </Button>
+                )}
+              </div>
+            </div>
 
-                <Tabs defaultValue="results" className="w-full space-y-6">
-                  <TabsList className="w-full sm:w-auto mb-4 grid grid-cols-2 sm:flex sm:inline-flex bg-white/50 dark:bg-gray-900/50">
-                    <TabsTrigger value="results" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
-                      Results
-                    </TabsTrigger>
-                    <TabsTrigger value="schedule" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
-                      Schedule
-                    </TabsTrigger>
-                  </TabsList>
+            <Tabs defaultValue="results" className="w-full space-y-6">
+              <TabsList className="w-full sm:w-auto mb-4 grid grid-cols-2 sm:flex sm:inline-flex bg-white/50 dark:bg-gray-900/50 border border-gray-200 dark:border-gray-800">
+                <TabsTrigger 
+                  value="results" 
+                  className="data-[state=active]:bg-blue-50 dark:data-[state=active]:bg-blue-900/20 data-[state=active]:text-blue-600 dark:data-[state=active]:text-blue-400 text-sm sm:text-base"
+                >
+                  <CheckCircle className="h-4 w-4 mr-2" />
+                  Results
+                </TabsTrigger>
+                <TabsTrigger 
+                  value="schedule"
+                  className="data-[state=active]:bg-blue-50 dark:data-[state=active]:bg-blue-900/20 data-[state=active]:text-blue-600 dark:data-[state=active]:text-blue-400 text-sm sm:text-base"
+                >
+                  <Calendar className="h-4 w-4 mr-2" />
+                  Schedule
+                </TabsTrigger>
+              </TabsList>
 
               <TabsContent value="results" className="mt-0">
                 <div className="space-y-4">
@@ -162,12 +205,10 @@ const Index = () => {
                   </Card>
                 </div>
               </TabsContent>
-                </Tabs>
-              </div>
-            </CardContent>
-          </Card>
-        </div>
-      </main>
+            </Tabs>
+          </CardContent>
+        </Card>
+      </div>
     </div>
   );
 };
