@@ -3,10 +3,43 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>euroball-stats-hub</title>
-    <meta name="description" content="Lovable Generated Project" />
-    <meta name="author" content="Lovable" />
-    <meta property="og:image" content="/og-image.png" />
+    
+    <!-- Primary Meta Tags -->
+    <title>euroleague.day - European Basketball Statistics & Analysis</title>
+    <meta name="title" content="euroleague.day - European Basketball Statistics & Analysis" />
+    <meta name="description" content="Comprehensive EuroLeague basketball statistics, live scores, and player analytics. Your ultimate source for European basketball data and NBA Europe coverage." />
+    <meta name="keywords" content="EuroLeague, European Basketball, NBA Europe, Euro NBA, basketball stats, EuroLeague statistics, basketball analytics, European basketball league" />
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyNTYiIGhlaWdodD0iMjU2IiB2aWV3Qm94PSIwIDAgMjU2IDI1NiI+PHJlY3Qgd2lkdGg9IjI1NiIgaGVpZ2h0PSIyNTYiIGZpbGw9Im5vbmUiLz48cGF0aCBmaWxsPSIjMDAwIiBkPSJNMjQwIDkyLjIzdjcxLjU0YTQgNCAwIDAgMS00LjQxIDRhNDAgNDAgMCAwIDEgMC03OS41MmE0IDQgMCAwIDEgNC40MSAzLjk4TTIwLjQxIDE2Ny43NmE0MCA0MCAwIDAgMCAwLTc5LjUyYTQgNCAwIDAgMC00LjQxIDR2NzEuNTRhNCA0IDAgMCAwIDQuNDEgMy45OE0xMTYgNDhIMzJhMTYgMTYgMCAwIDAtMTYgMTZ2NC4xM2E0IDQgMCAwIDAgMy44IDRhNTYgNTYgMCAwIDEgMCAxMTEuNzRhNCA0IDAgMCAwLTMuOCA0VjE5MmExNiAxNiAwIDAgMCAxNiAxNmg4NGE0IDQgMCAwIDAgNC00VjUyYTQgNCAwIDAgMC00LTRtMTA4IDBoLTg0YTQgNCAwIDAgMC00IDR2MTUyYTQgNCAwIDAgMCA0IDRoODRhMTYgMTYgMCAwIDAgMTYtMTZ2LTQuMTNhNCA0IDAgMCAwLTMuOC00YTU2IDU2IDAgMCAxIDAtMTExLjc0YTQgNCAwIDAgMCAzLjgtNFY2NGExNiAxNiAwIDAgMC0xNi0xNiIvPjwvc3ZnPg==" />
+    <link rel="apple-touch-icon" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyNTYiIGhlaWdodD0iMjU2IiB2aWV3Qm94PSIwIDAgMjU2IDI1NiI+PHJlY3Qgd2lkdGg9IjI1NiIgaGVpZ2h0PSIyNTYiIGZpbGw9Im5vbmUiLz48cGF0aCBmaWxsPSIjMDAwIiBkPSJNMjQwIDkyLjIzdjcxLjU0YTQgNCAwIDAgMS00LjQxIDRhNDAgNDAgMCAwIDEgMC03OS41MmE0IDQgMCAwIDEgNC40MSAzLjk4TTIwLjQxIDE2Ny43NmE0MCA0MCAwIDAgMCAwLTc5LjUyYTQgNCAwIDAgMC00LjQxIDR2NzEuNTRhNCA0IDAgMCAwIDQuNDEgMy45OE0xMTYgNDhIMzJhMTYgMTYgMCAwIDAtMTYgMTZ2NC4xM2E0IDQgMCAwIDAgMy44IDRhNTYgNTYgMCAwIDEgMCAxMTEuNzRhNCA0IDAgMCAwLTMuOCA0VjE5MmExNiAxNiAwIDAgMCAxNiAxNmg4NGE0IDQgMCAwIDAgNC00VjUyYTQgNCAwIDAgMC00LTRtMTA4IDBoLTg0YTQgNCAwIDAgMC00IDR2MTUyYTQgNCAwIDAgMCA0IDRoODRhMTYgMTYgMCAwIDAgMTYtMTZ2LTQuMTNhNCA0IDAgMCAwLTMuOC00YTU2IDU2IDAgMCAxIDAtMTExLjc0YTQgNCAwIDAgMCAzLjgtNFY2NGExNiAxNiAwIDAgMC0xNi0xNiIvPjwvc3ZnPg==" />
+    
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://euroleague.day/" />
+    <meta property="og:title" content="euroleague.day - European Basketball Statistics & Analysis" />
+    <meta property="og:description" content="Track EuroLeague basketball statistics, live scores, and comprehensive player analytics. Your go-to source for European basketball and NBA Europe coverage." />
+    <meta property="og:image" content="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyNTYiIGhlaWdodD0iMjU2IiB2aWV3Qm94PSIwIDAgMjU2IDI1NiI+PHJlY3Qgd2lkdGg9IjI1NiIgaGVpZ2h0PSIyNTYiIGZpbGw9Im5vbmUiLz48cGF0aCBmaWxsPSIjMDAwIiBkPSJNMjQwIDkyLjIzdjcxLjU0YTQgNCAwIDAgMS00LjQxIDRhNDAgNDAgMCAwIDEgMC03OS41MmE0IDQgMCAwIDEgNC40MSAzLjk4TTIwLjQxIDE2Ny43NmE0MCA0MCAwIDAgMCAwLTc5LjUyYTQgNCAwIDAgMC00LjQxIDR2NzEuNTRhNCA0IDAgMCAwIDQuNDEgMy45OE0xMTYgNDhIMzJhMTYgMTYgMCAwIDAtMTYgMTZ2NC4xM2E0IDQgMCAwIDAgMy44IDRhNTYgNTYgMCAwIDEgMCAxMTEuNzRhNCA0IDAgMCAwLTMuOCA0VjE5MmExNiAxNiAwIDAgMCAxNiAxNmg4NGE0IDQgMCAwIDAgNC00VjUyYTQgNCAwIDAgMC00LTRtMTA4IDBoLTg0YTQgNCAwIDAgMC00IDR2MTUyYTQgNCAwIDAgMCA0IDRoODRhMTYgMTYgMCAwIDAgMTYtMTZ2LTQuMTNhNCA0IDAgMCAwLTMuOC00YTU2IDU2IDAgMCAxIDAtMTExLjc0YTQgNCAwIDAgMCAzLjgtNFY2NGExNiAxNiAwIDAgMC0xNi0xNiIvPjwvc3ZnPg==" />
+    
+    <!-- Twitter -->
+    <meta property="twitter:card" content="summary_large_image" />
+    <meta property="twitter:url" content="https://euroleague.day/" />
+    <meta property="twitter:title" content="euroleague.day - European Basketball Statistics & Analysis" />
+    <meta property="twitter:description" content="Real-time EuroLeague basketball statistics, scores, and in-depth player analytics. The ultimate hub for European basketball and NBA Europe information." />
+    <meta property="twitter:image" content="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyNTYiIGhlaWdodD0iMjU2IiB2aWV3Qm94PSIwIDAgMjU2IDI1NiI+PHJlY3Qgd2lkdGg9IjI1NiIgaGVpZ2h0PSIyNTYiIGZpbGw9Im5vbmUiLz48cGF0aCBmaWxsPSIjMDAwIiBkPSJNMjQwIDkyLjIzdjcxLjU0YTQgNCAwIDAgMS00LjQxIDRhNDAgNDAgMCAwIDEgMC03OS41MmE0IDQgMCAwIDEgNC40MSAzLjk4TTIwLjQxIDE2Ny43NmE0MCA0MCAwIDAgMCAwLTc5LjUyYTQgNCAwIDAgMC00LjQxIDR2NzEuNTRhNCA0IDAgMCAwIDQuNDEgMy45OE0xMTYgNDhIMzJhMTYgMTYgMCAwIDAtMTYgMTZ2NC4xM2E0IDQgMCAwIDAgMy44IDRhNTYgNTYgMCAwIDEgMCAxMTEuNzRhNCA0IDAgMCAwLTMuOCA0VjE5MmExNiAxNiAwIDAgMCAxNiAxNmg4NGE0IDQgMCAwIDAgNC00VjUyYTQgNCAwIDAgMC00LTRtMTA4IDBoLTg0YTQgNCAwIDAgMC00IDR2MTUyYTQgNCAwIDAgMCA0IDRoODRhMTYgMTYgMCAwIDAgMTYtMTZ2LTQuMTNhNCA0IDAgMCAwLTMuOC00YTU2IDU2IDAgMCAxIDAtMTExLjc0YTQgNCAwIDAgMCAzLjgtNFY2NGExNiAxNiAwIDAgMC0xNi0xNiIvPjwvc3ZnPg==" />
+
+    <!-- Additional SEO Meta Tags -->
+    <meta name="robots" content="index, follow" />
+    <meta name="author" content="euroleague.day" />
+    <meta name="language" content="English" />
+    
+    <!-- Canonical URL -->
+    <link rel="canonical" href="https://euroleague.day/" />
+    
+    <!-- Preconnect to important third-party domains -->
+    <link rel="preconnect" href="https://cdn.gpteng.co" />
+    
+    <meta name="theme-color" content="#000000" />
   </head>
 
   <body>
