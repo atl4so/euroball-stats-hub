@@ -1,10 +1,10 @@
-# euroleague.day 🏀
+# euronba.com 🏀
 
 A comprehensive web application for tracking EuroLeague basketball statistics, game schedules, and team performance metrics.
 
 ## Overview
 
-euroleague.day provides real-time access to EuroLeague basketball data, including:
+euronba.com provides real-time access to EuroLeague basketball data, including:
 
 - Live game scores and schedules
 - Detailed player statistics
